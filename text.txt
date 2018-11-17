@@ -1,1 +1,6 @@
+<<<<<<< HEAD
 asdf asdf
+=======
+asdf jkl;
+another test
+>>>>>>> a77519000239e948088ef12a9dbb79e1f8394315
