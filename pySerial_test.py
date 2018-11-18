@@ -5,11 +5,12 @@ def main():
 
 	while True:
 		# print("".join(map(chr, ser.readline())), end='')
-		line = "".join(map(chr, ser.readline()))
-		line = line.split(',')
-		if len(line) == 1:
-			continue
-		print(line[0], line[1].rstrip('\n\r'))
+		line = "".join(map(chr, ser.readline())).rstrip()
+		# line = line.split(',')
+		# if len(line) == 1:
+			# continue
+		if len(line) == 15: # ignore fragments
+			print(line)
 
 if __name__ == "__main__":
 	main()

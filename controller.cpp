@@ -46,15 +46,27 @@ void getPinStates()
 
 
 // comms format:
-// <pin number>,<0 for button down, 1 for button up><newline>
+// <pin 1> , <0 for button down, 1 for button up> , <pin 2>,...,<newline>
 void transmit()
 {
-	for (int i = 0; i < numPinStates; i++)
+	const int numChars = 15; // 4 pins + 4 states + 7 commas = 15 characters
+
+	for (int i = 0; i < numChars; i++)
 	{
-		Serial.print(buttonPins[i]);
-		Serial.print(',');
-		Serial.println(pinStates[i]);
+		// i in (0, 4, 8, 12): add pin ID (0, 1, 2, 3)
+		if (i % 4 == 0)
+			Serial.print(buttonPins[i/numButtonPins]);
+
+		// i in (2, 6, 10, 14): add pin state (0, 1, 2, 3)
+		else if ((i+2) % 2 == 0)
+			Serial.print(pinStates[(i-2)/numPinStates]);
+
+		// i is odd: add comma 
+		else if (i % 2 != 0)
+			Serial.print(',');
 	}
+
+	Serial.println();
 }
 
 int main()
