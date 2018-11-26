@@ -4,7 +4,8 @@
 #include <Arduino.h>
 
 #define SHORT_DELAY 50 // 50 ms delay for button debounce
-#define DEBUG true // set false before submitting!
+#define DEBUG false // set false before submitting!
+#define BAUD_RATE 9600 // 9600
 
 // pin numbers
 const int pinButtonRight = 6;
@@ -21,7 +22,8 @@ const int numPinStates = sizeof(pinStates) / sizeof(pinStates[0]);
 void setup()
 {
 	init();
-	Serial.begin(9600); // serial comms is done over default Serial port
+	Serial.begin(BAUD_RATE); // serial comms is done over default Serial port
+	Serial.setTimeout(1); // TEST
 	#if DEBUG
 		Serial.println("[DEBUG] Serial setup complete.");
 	#endif
