@@ -1,2 +1,60 @@
-# pyTetris
-Python implementation of Tetris with Arduino button controls.
+----------------------------------------------------------
+Name: Dillon Allan
+ID: 1350542
+CMPUT 274, Fall 2018
+
+Final Project: pytetris - Python implementation of Tetris
+----------------------------------------------------------
+
+Included Files:
+	<ADD ALL REQUIRED FILES HERE>
+    README
+
+Running Instructions:
+	
+
+Notes and Assumptions:
+
+
+Accessories: (for optional Arduino 4-button game controller)
+	- Arduino Mega Board (AMG)
+	- Pushbutton (4)
+	- USB A-micro cable
+
+
+Wiring instructions:
+	
+	*****UPDATE THESE INSTRUCTIONS*****
+
+	Pin 6 <--> increment pushbutton lead|other lead <--> GND
+	Pin 7 <--> decrement pushbutton lead|other lead <--> GND
+	Pin 9 <--> LED 0 (red) long lead|short lead <--> 560 Ohm resistor <--> GND
+	Pin 10<--> LED 1 (red) long lead|short lead <--> 560 Ohm resistor <--> GND
+	Pin 11<--> LED 2 (grn) long lead|short lead <--> 560 Ohm resistor <--> GND
+	Pin 12<--> LED 3 (red) long lead|short lead <--> 560 Ohm resistor <--> GND
+	Pin 13<--> LED 4 (red) long lead|short lead <--> 560 Ohm resistor <--> GND
+	
+	Pin 5V  <--> Power  (+) rail on breadboard
+	Pin GND <--> Ground (-) rail on breadboard
+
+
+Extra Features:
+	Game built with pygame:
+	https://www.pygame.org/docs/
+
+	Serial interfacing between python and connected Arduino via pyserial:
+	https://pythonhosted.org/pyserial/
+
+	Multithreading for background serial processing and pygame event posting:
+	https://stackoverflow.com/questions/15538287/can-i-add-pygame-events-from-a-second-thread
+	https://stackoverflow.com/questions/18018033/how-to-stop-a-looping-thread-in-python
+
+
+
+
+
+
+
+
+
+

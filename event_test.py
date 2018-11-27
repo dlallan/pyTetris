@@ -90,8 +90,8 @@ def check_events(game):
 				sys.exit()
 
 			elif event.type == pygame.KEYDOWN:
-				if DEBUG:
-					print("KEYDOWN event for key %s" % (event.key))
+				# if DEBUG:
+				# 	print("KEYDOWN event for key %s" % (event.key))
 				
 				if event.key == pygame.K_ESCAPE:
 					TEST_ser_thread.stop_worker_thread()
@@ -184,8 +184,10 @@ def poll_serial(serial_port):
 	else:
 		return None
 
+
+### TODO: try limiting the number of event posts to 1 every x ms with pygame.time.ticks...
 def ser_worker(serial_port):
-	t = threading.currentThread()
+	t = threading.currentThread()  # need to check if parent thread modified t.stop
 	print("serial_port arg:", serial_port)
 	while(not t.stop):
 		pinStates = poll_serial(serial_port)
@@ -196,8 +198,9 @@ def ser_worker(serial_port):
 				print("pinStates was empty")
 			pass
 		else:	
-			if DEBUG:
-				print(pinStates)
+			pass
+			# if DEBUG:
+			# 	print(pinStates)
 
 			with LOCK: # TEST
 				for i in range(len(pinStates)):
@@ -222,7 +225,7 @@ def ser_worker(serial_port):
 						pygame.event.post(ev)
 						if DEBUG:
 							print("Posted KEYDOWN event for key: %s" % (key))
-		t = threading.currentThread()
+		t = threading.currentThread()  # need to check if parent thread modified t.stop
 
 		time.sleep(0.1)  # keep thread from pinning
 	if DEBUG:
