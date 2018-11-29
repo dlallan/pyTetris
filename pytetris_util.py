@@ -30,8 +30,14 @@ DIFFICULTY_CHANGE_THRESHOLD = SCORE_MULTIPLIER * 5 # increase difficulty every 5
 SERIAL_PORT = '/dev/ttyACM0'
 BAUD_RATE = 9600
 
+
 # event helpers
 def quit_game(game):
+    #   print("trying to stop worker thread:", TEST_ser_thread)
+    #   TEST_ser_thread.stop_worker_thread()
+    #   # TEST_ser_thread.stop = True
+    #   # TEST_ser_thread.join()
+    #   sys.exit()
     game.game_over = True
     pygame.display.quit()
     pygame.quit()
@@ -90,10 +96,14 @@ def startup_tetris():
     
     update_score_display(game)
     
+    # start at lowest difficulty i.e. speed shapes move down
+    set_move_down_event(EASY, game)
+
     # TEST_ser_thread = WorkerThread(ser_worker, game.serial_port)
     # TEST_ser_thread.start()
 
     return game
+
 
 # update helpers
 def update(game):
@@ -116,6 +126,10 @@ def update(game):
             # if filled rows exist, clear them, drop above rows immediately,
             # update score, and check for difficulty increase
 
+# Description
+# Create or replace the custom event with the given difficulty
+def set_move_down_event(difficulty, game):
+    pygame.time.set_timer(game.move_down_event, difficulty)
 
 
 def check_for_game_over(game):
@@ -148,50 +162,52 @@ def check_events(game):
         
         if event.type == pygame.QUIT:
             quit_game(game)
+
+        elif event.type == pygame.KEYDOWN:
+            handle_keydown_events(event, game)
+        
+        elif event.type == game.move_down_event:
+            game.move_down_active_shape()
+
         else:
             pygame.event.pump() # let pygame process internal events
 
 
-        #   print("trying to stop worker thread:", TEST_ser_thread)
-        #   TEST_ser_thread.stop_worker_thread()
-        #   # TEST_ser_thread.stop = True
-        #   # TEST_ser_thread.join()
-        #   sys.exit()
+def handle_keydown_events(event, game):
+    if DEBUG:
+        print("KEYDOWN event for key %s" % (event.key))
+        
+    if event.key == pygame.K_ESCAPE:
+        # TEST_ser_thread.stop_worker_thread()
+        # sys.exit()
+        quit_game(game)
 
-        # elif event.type == pygame.KEYDOWN:
-        #   # if DEBUG:
-        #   #   print("KEYDOWN event for key %s" % (event.key))
-            
-        #   if event.key == pygame.K_ESCAPE:
-        #       TEST_ser_thread.stop_worker_thread()
-        #       sys.exit()
+    #   if event.key in (pygame.K_w,pygame.K_UP):
+    #       if game.objects[0].y - 5 >= 0:
+    #           game.objects[0].y -= 5
+    #       else:
+    #           game.objects[0].y = 0
 
-        #   if event.key in (pygame.K_w,pygame.K_UP):
-        #       if game.objects[0].y - 5 >= 0:
-        #           game.objects[0].y -= 5
-        #       else:
-        #           game.objects[0].y = 0
+    #   if event.key in (pygame.K_a, pygame.K_LEFT):
+    #       if game.objects[0].x - 5 >= 0:
+    #           game.objects[0].x -= 5
+    #       else:
+    #           game.objects[0].x = 0
 
-        #   if event.key in (pygame.K_a, pygame.K_LEFT):
-        #       if game.objects[0].x - 5 >= 0:
-        #           game.objects[0].x -= 5
-        #       else:
-        #           game.objects[0].x = 0
+    #   if event.key in (pygame.K_s, pygame.K_DOWN):
+    #       if game.objects[0].y + game.objects[0].length + 5 <= SCREEN_HEIGHT:
+    #           game.objects[0].y += 5
+    #       else:
+    #           game.objects[0].y = SCREEN_HEIGHT - game.objects[0].length
 
-        #   if event.key in (pygame.K_s, pygame.K_DOWN):
-        #       if game.objects[0].y + game.objects[0].length + 5 <= SCREEN_HEIGHT:
-        #           game.objects[0].y += 5
-        #       else:
-        #           game.objects[0].y = SCREEN_HEIGHT - game.objects[0].length
+    #   if event.key in (pygame.K_d, pygame.K_RIGHT):
+    #       if game.objects[0].x + game.objects[0].width + 5 <= SCREEN_WIDTH:
+    #           game.objects[0].x += 5
+    #       else:
+    #           game.objects[0].x = SCREEN_WIDTH - game.objects[0].width
 
-        #   if event.key in (pygame.K_d, pygame.K_RIGHT):
-        #       if game.objects[0].x + game.objects[0].width + 5 <= SCREEN_WIDTH:
-        #           game.objects[0].x += 5
-        #       else:
-        #           game.objects[0].x = SCREEN_WIDTH - game.objects[0].width
-
-        # elif event.type == pygame.USEREVENT: # TEST
-        #   print(event.code)
+    # elif event.type == pygame.USEREVENT: # TEST
+    #   print(event.code)
 
 
 # render helpers

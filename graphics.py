@@ -23,16 +23,18 @@ class shape:
         self.location = location
         self.color = color
         self.falling = True
-    def draw(self, block_dim):
-        pygame.draw.rect(window, self.color, (self.location[0], self.location[1], block_dim, block_dim))
+    # def draw(self, block_dim):
+    #     pygame.draw.rect(window, self.color, (self.location[0], self.location[1], block_dim, block_dim))
 
 class square(shape):
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)
-        self.location = location
-        self.color = color
-        self.blocks = [[self.location[0], self.location[1]], [self.location[0] + block_dim, self.location[1]], 
-        [self.location[0] + block_dim, self.location[1] + block_dim], [self.location[0], self.location[1] + block_dim]]
+        # self.location = location
+        # self.color = color
+        self.blocks = [ block([self.location[0], self.location[1]], color, block_dim, window), \
+                        block([self.location[0] + block_dim, self.location[1]], color, block_dim, window), \
+                        block([self.location[0] + block_dim, self.location[1] + block_dim],color, block_dim, window), \
+                        block([self.location[0], self.location[1] + block_dim],color, block_dim, window) ]
         self.height = block_dim * 2
 
 
@@ -42,7 +44,8 @@ class square(shape):
 
     def draw(self, window, block_dim):
         for block in self.blocks:
-            pygame.draw.rect(window, self.color, (block[0], block[1], block_dim, block_dim))
+            pygame.draw.rect(window, self.color, (block.location[0], block.location[1], block_dim, block_dim))
+            
 
 class rectangle(shape):
     def __init__(self, location, color, block_dim, window):

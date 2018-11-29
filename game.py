@@ -1,5 +1,5 @@
 # <put class header info here>
-import graphics, random
+import graphics, pygame, random
 
 class Game:
 	backgroundColor = (0, 0, 0)
@@ -14,44 +14,45 @@ class Game:
 		self.paused = False
 		self.game_over = False
 		self.rgen = random.Random() # get a new seed every time
+		self.move_down_event = pygame.USEREVENT + 1 # get ID for the custom pygame event
 
 	# create a new random shape with a random color
 	def spawn_new_shape(self):
 		shapes = graphics.shapes.get_shapes()
-		rand_shape_type = shapes[self.rgen.randint(0,len(shapes)-1)]
+		rand_shape_type = shapes[0]#shapes[self.rgen.randint(0,len(shapes)-1)]
 		rand_color = self.get_rand_color()
 
 		# make sure each shape started in the top centre of the window
 		if rand_shape_type == graphics.shapes.square: 
-			location = (4*self.tile_size,0)
+			location = [4*self.tile_size,0]
 			new_shape = graphics.square(location, rand_color, self.tile_size, self.window)
 		
 		elif rand_shape_type ==  graphics.shapes.rectangle:
-			location = (3*self.tile_size,0)
+			location = [3*self.tile_size,0]
 			new_shape = graphics.rectangle(location, rand_color, self.tile_size, self.window)
 		
 		elif rand_shape_type == graphics.shapes.tee:
-			location = (4*self.tile_size,0)
+			location = [4*self.tile_size,0]
 			new_shape = graphics.tee(location, rand_color, self.tile_size, self.window)
 		
 		elif rand_shape_type == graphics.shapes.leftz:
-			location = (4*self.tile_size,0)
+			location = [4*self.tile_size,0]
 			new_shape = graphics.leftz(location, rand_color, self.tile_size, self.window)
 		
 		elif rand_shape_type == graphics.shapes.rightz:
-			location = (4*self.tile_size,0)
+			location = [4*self.tile_size,0]
 			new_shape = graphics.rightz(location, rand_color, self.tile_size, self.window)
 		
 		elif rand_shape_type == graphics.shapes.leftl:
-			location = (4*self.tile_size,0)
+			location = [4*self.tile_size,0]
 			new_shape = graphics.leftl(location, rand_color, self.tile_size, self.window)
 		
 		elif rand_shape_type == graphics.shapes.rightl:
-			location = (4*self.tile_size,0)
+			location = [4*self.tile_size,0]
 			new_shape = graphics.rightl(location, rand_color, self.tile_size, self.window)
 		
 		else:
-			raise TypeError("Unrecognized shape %s specified." % (rand_shape_type))
+			raise TypeError("Error: unrecognized shape specified: %s" % (rand_shape_type))
 
 		self.active_shape = new_shape
 
@@ -85,3 +86,10 @@ class Game:
 	def get_grid_blocks(self):
 		# Assumption: all objects in self.grid are either None or type graphics.block
 		return [b for b in self.grid if b]
+
+
+	def move_down_active_shape(self):
+		# TODO: check boundaries
+		self.active_shape.location[1] += self.tile_size
+		for b in self.active_shape.blocks:
+			b.location[1] += self.tile_size
