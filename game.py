@@ -9,15 +9,7 @@ class Game:
 		self.paused = False
 		self.game_over = False
 
-	def clear_window(self):
-		# clear window
-		self.window.fill(backgroundColor)
 
-	def draw_objects(self):
-		# draw stuff
-		for o in self.objects:
-			try:
-				o.draw()
-			except AttributeError:
-				print("object did not have a draw method.")
+
+
  

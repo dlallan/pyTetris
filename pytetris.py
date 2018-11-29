@@ -6,13 +6,10 @@ import pytetris_util
 DEBUG = True  # set to False before demo and before submitting!
 
 
-
-
-
 # game states
 def game_over(game):
 	print("Game over. Player score: %s" % (game.player_score))
-	start_new_game = pytetris_util.get_player_ready("Start new game? (y/n) ")
+	start_new_game = pytetris_util.get_player_ready("Return to Start Menu? (y/n) ")
 	
 	if start_new_game:
 		new_game()
@@ -37,13 +34,15 @@ def main_game(game):
 		print("[DEBUG] Starting new game.")
 
 	# run main loop for the game
-	while True:
+	while not game.game_over:
+		pytetris_util.render(game)
 		pytetris_util.check_events(game)
 		pytetris_util.update(game)
-		pytetris_util.render(game)
 		
-		game.clock.tick(FPS) # lock game speed to FPS
+		game.clock.tick(pytetris_util.FPS) # lock game speed to FPS
 
+	# main game ended --> trigger game over
+	game_over(game)
 
 def new_game():
 	pytetris_util.print_welcome("Welcome to pytetris!")
