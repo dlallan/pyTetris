@@ -26,6 +26,7 @@ class shape:
     # def draw(self, block_dim):
     #     pygame.draw.rect(window, self.color, (self.location[0], self.location[1], block_dim, block_dim))
 
+
 class square(shape):
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)

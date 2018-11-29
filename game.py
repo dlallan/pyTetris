@@ -67,10 +67,10 @@ class Game:
 
 	def init_grid(self, tiles_width, tiles_height):
 		self.grid = []
-		for x in range(tiles_width):
+		for row in range(tiles_height):
 			self.grid.append([])
-			for y in range(tiles_height):
-				self.grid[x].append(None)
+			for col in range(tiles_width):
+				self.grid[row].append(None)
 
 
 	def get_object_locations(self):

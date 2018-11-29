@@ -5,6 +5,8 @@ from game import Game
 
 
 #globals
+DEBUG = False  # set to True before submission!
+
 TILE_SIZE = 40 # controls size of screen, shapes, etc.
 NUM_TILES_WIDE = 10
 NUM_TILES_LONG = 20
