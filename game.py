@@ -75,7 +75,7 @@ class Game:
 
 	def get_object_locations(self):
 		shape_blocks_locs = [b.location for b in self.active_shape.blocks]
-		grid_blocks_locs = [b.location for b in self.get_grid_blocks]
+		grid_blocks_locs = [b.location for b in self.get_grid_blocks()]
 		locs = [shape_blocks_locs]
 		for i in range(len(grid_blocks_locs)):
 			locs.append(grid_blocks_locs[i])
