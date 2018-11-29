@@ -1,7 +1,22 @@
 import pygame
-block_dim = 30
+# block_dim = 30
 
-SHAPES = ("square", "rectangle", "tee", "leftz", "rightz", "leftl", "rightl")
+
+class shapes:
+    square = "square"
+    rectangle = "rectangle"
+    tee = "tee"
+    leftz = "leftz"
+    rightz = "rightz"
+    leftl = "leftl"
+    rightl = "rightl"
+    
+    @staticmethod
+    def get_shapes():
+        return  shapes.square, shapes.rectangle,\
+                shapes.tee, shapes.leftz, shapes.rightz,\
+                shapes.leftl, shapes.rightl
+
 
 class shape:
     def __init__(self, location, color, block_dim, window):
@@ -13,6 +28,7 @@ class shape:
 
 class square(shape):
     def __init__(self, location, color, block_dim, window):
+        super().__init__(location, color, block_dim, window)
         self.location = location
         self.color = color
         self.blocks = [[self.location[0], self.location[1]], [self.location[0] + block_dim, self.location[1]], 
@@ -30,6 +46,7 @@ class square(shape):
 
 class rectangle(shape):
     def __init__(self, location, color, block_dim, window):
+        super().__init__(location, color, block_dim, window)
         self.location = location
         self.color = color
         self.blocks = [[self.location[0], self.location[1]], [self.location[0] + block_dim, self.location[1]], 
@@ -54,6 +71,7 @@ class rectangle(shape):
 
 class tee(shape):
     def __init__(self, location, color, block_dim, window):
+        super().__init__(location, color, block_dim, window)
         self.location = location
         self.color = color
         self.blocks = [[self.location[0], self.location[1]], [self.location[0] + block_dim, self.location[1]], 
@@ -77,6 +95,7 @@ class tee(shape):
 
 class leftz(shape):
     def __init__(self, location, color, block_dim, window):
+        super().__init__(location, color, block_dim, window)
         self.location = location
         self.color = color
         self.blocks = [[self.location[0], self.location[1]], [self.location[0] + block_dim, self.location[1] + block_dim], 
@@ -101,6 +120,7 @@ class leftz(shape):
 
 class rightz(shape):
     def __init__(self, location, color, block_dim, window):
+        super().__init__(location, color, block_dim, window)
         self.location = location
         self.color = color
         self.blocks = [[self.location[0], self.location[1]], [self.location[0] + block_dim, self.location[1]], 
@@ -124,6 +144,7 @@ class rightz(shape):
 
 class leftl(shape):
     def __init__(self, location, color, block_dim, window):
+        super().__init__(location, color, block_dim, window)
         self.location = location
         self.color = color
         self.blocks = [[self.location[0], self.location[1] + block_dim], [self.location[0] + block_dim, self.location[1] + block_dim], 
@@ -147,6 +168,7 @@ class leftl(shape):
 
 class rightl(shape):
     def __init__(self, location, color, block_dim, window):
+        super().__init__(location, color, block_dim, window)
         self.location = location
         self.color = color
         self.blocks = [[self.location[0] + block_dim, self.location[1]], [self.location[0] - block_dim, self.location[1] + block_dim], 

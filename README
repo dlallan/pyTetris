@@ -49,7 +49,12 @@ Extra Features:
 	https://stackoverflow.com/questions/15538287/can-i-add-pygame-events-from-a-second-thread
 	https://stackoverflow.com/questions/18018033/how-to-stop-a-looping-thread-in-python
 
-
+	Static Properties and Methods:
+	https://stackoverflow.com/questions/68645/are-static-class-variables-possible
+	https://stackoverflow.com/questions/735975/static-methods-in-python
+	
+	class inheritance with super:
+	https://www.pythonforbeginners.com/super/working-python-super-function
 
 
 

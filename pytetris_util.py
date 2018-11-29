@@ -1,6 +1,6 @@
 # <add info header here>
 
-import sys, pygame 
+import graphics, sys, pygame 
 from game import Game
 
 
@@ -67,32 +67,6 @@ def get_player_ready(prompt):
     return begin
 
 
-# update helpers
-# update game state here
-def update(game):
-    # if there's no shape, spawn a new one
-
-    # else there is a shape -- check if not falling
-
-    # if not falling, check for game over cnd
-    # if not game over, unpack to grid and delete old shape
-
-    # check for filled rows
-    # if filled rows exist, clear them, drop above rows immediately,
-    # update score, and check for difficulty increase
-
-    pass
-
-
-def update_score(game, n):
-    game.player_score += n*SCORE_MULTIPLIER
-    return
-
-
-def update_score_display(game):
-    pygame.display.set_caption("pytetris | player score: %s" % (game.player_score))
-
-
 def exit_with_msg(msg):
     print(msg)
     sys.exit()
@@ -111,7 +85,8 @@ def startup_tetris():
     #   print("[DEBUG] startup: Couldn't connect to serial port", SERIAL_PORT)
     #   pass
 
-    game = Game(pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)), pygame.time.Clock())
+    game = Game(pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)),
+        TILE_SIZE, NUM_TILES_WIDE, NUM_TILES_LONG, pygame.time.Clock())
     
     update_score_display(game)
     
@@ -120,46 +95,54 @@ def startup_tetris():
 
     return game
 
-# render helpers
-def draw_grid(game):
-    for x in range(0, NUM_TILES_WIDE+1):
-        start = (x*TILE_SIZE, 0)
-        end = (x*TILE_SIZE, SCREEN_HEIGHT)
-        pygame.draw.line(game.window, WHITE, start, end, GRID_LINE_THICKNESS)
+# update helpers
+def update(game):
+    # if there's no shape, spawn a new one
+    if not check_for_active_shape(game):
+        game.spawn_new_shape()
 
-    for y in range(0, NUM_TILES_LONG+1):
-        start = (0, y*TILE_SIZE)
-        end = (SCREEN_WIDTH, y*TILE_SIZE)
-        pygame.draw.line(game.window, WHITE, start, end, GRID_LINE_THICKNESS)
+    # else there is a shape -- check if not falling
+    else:
+        if not game.active_shape.falling:
+            # if not falling, check for game over cnd
+            if check_for_game_over(game):
+                quit_game(game)
 
+            # if not game over, unpack to grid and delete old shape
+            else:
+                game.unpack_active_shape()
 
-def clear_window(game):
-    # clear window
-    game.window.fill(Game.backgroundColor)
-
-
-def draw_objects(game):
-    # draw stuff
-    for o in game.objects:
-        try:
-            o.draw()
-        except AttributeError:
-            print("object did not have a draw method.")
-
-
-def render(game):
-    clear_window(game)
-    draw_objects(game)
-    draw_grid(game)
-
-    # update frame
-    pygame.display.flip()
+            # check for filled rows
+            # if filled rows exist, clear them, drop above rows immediately,
+            # update score, and check for difficulty increase
 
 
 
+def check_for_game_over(game):
+    # get list of locations for all objects
+    locs = game.get_object_locations()
+    # check if location of active shape intersects with a block in the grid
+    if pygame.rect.collidelist(locs) == -1:
+        return True
+    else:
+        return False
 
+
+def check_for_active_shape(game):
+    return game.active_shape
+
+
+def update_score(game, n):
+    game.player_score += n*SCORE_MULTIPLIER
+
+
+def update_score_display(game):
+    pygame.display.set_caption("pytetris | player score: %s" % (game.player_score))
+
+
+# event helpers
 def check_events(game):
-    global TEST_ser_thread
+    # global TEST_ser_thread
     # with LOCK:# TEST
     for event in pygame.event.get():
         
@@ -209,3 +192,54 @@ def check_events(game):
 
         # elif event.type == pygame.USEREVENT: # TEST
         #   print(event.code)
+
+
+# render helpers
+def render(game):
+    clear_window(game)
+    draw_objects(game)
+    draw_grid(game)
+
+    # update frame
+    pygame.display.flip()
+
+
+def clear_window(game):
+    # clear window
+    game.window.fill(Game.backgroundColor)
+
+
+def draw_objects(game):
+    # draw stuff
+    if check_for_active_shape(game):
+        game.active_shape.draw(game.window, TILE_SIZE)
+
+    for x in range(len(game.grid)):
+        for y in range(len(game.grid[x])):        
+            if game.grid[x][y]:
+                game.grid[x][y].draw(game.window, TILE_SIZE)
+
+    # for o in game.objects:
+    #     try:
+    #         o.draw()
+    #     except AttributeError:
+    #         print("object did not have a draw method.")
+
+
+def draw_grid(game):
+    for x in range(0, NUM_TILES_WIDE+1):
+        start = (x*TILE_SIZE, 0)
+        end = (x*TILE_SIZE, SCREEN_HEIGHT)
+        pygame.draw.line(game.window, WHITE, start, end, GRID_LINE_THICKNESS)
+
+    for y in range(0, NUM_TILES_LONG+1):
+        start = (0, y*TILE_SIZE)
+        end = (SCREEN_WIDTH, y*TILE_SIZE)
+        pygame.draw.line(game.window, WHITE, start, end, GRID_LINE_THICKNESS)
+
+
+
+
+
+
+
