@@ -3,7 +3,7 @@
 import pytetris_util
 
 # globals
-DEBUG = True  # set to False before demo and before submitting!
+DEBUG = False  # set to False before demo and before submitting!
 
 
 # game states
@@ -41,8 +41,8 @@ def main_game(game):
 		
 		game.clock.tick(pytetris_util.FPS) # lock game speed to FPS
 
-	# main game ended --> trigger game over
 	game_over(game)
+
 
 def new_game():
 	pytetris_util.print_welcome("Welcome to pytetris!")

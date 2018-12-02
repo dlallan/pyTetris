@@ -84,6 +84,7 @@ def exit_with_msg(msg):
 
 
 def startup_tetris():
+    global DIFFICULTIES
     # global TEST_ser_thread
 
     pygame.init()
@@ -140,7 +141,6 @@ def update(game):
             num_filled_rows = game.try_drop_filled_rows()
             if num_filled_rows:
                 update_score(game, num_filled_rows)
-
 
                 # increase difficulty every n rows cleared where n = DIFFICULTY_CHANGE_THRESHOLD
                 if num_filled_rows * SCORE_MULTIPLIER >= DIFFICULTY_CHANGE_THRESHOLD:
@@ -219,9 +219,6 @@ def handle_keydown_events(event, game):
 
     if event.key in (pygame.K_d, pygame.K_RIGHT): # move right
         try_move_right(game)
-
-    # elif event.type == pygame.USEREVENT: # TEST
-    #   print(event.code)
 
 
 def pause_game(game):
