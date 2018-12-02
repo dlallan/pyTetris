@@ -223,5 +223,6 @@ class block(shape):
     def __init__(self, location, color, block_dim, window):
         self.location = location
         self.color = color
+        self.block_dim = block_dim
     def draw(self, window, block_dim):
         pygame.draw.rect(window, self.color, (self.location[0], self.location[1], block_dim, block_dim))

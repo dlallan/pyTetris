@@ -113,16 +113,22 @@ def update(game):
     if not check_for_active_shape(game):
         game.spawn_new_shape()
 
+        # test if new shape has nowhere to go
+        if check_for_game_over(game):
+            quit_game(game)
+
     # else there is a shape -- check if not falling
     else:
         if not game.active_shape.falling:
             # if not falling, check for game over cnd
-            if check_for_game_over(game):
-                quit_game(game)
+            # if check_for_game_over(game):
+            #     quit_game(game)
 
-            # if not game over, unpack to grid and delete old shape
-            else:
-                game.unpack_active_shape()
+            # unpack active shape to grid and clear active shape
+            if DEBUG:
+                print("Unpacking active shape")
+            game.unpack_active_shape()
+            game.active_shape = None  # clear random shape
 
             # check for filled rows
             # if filled rows exist, clear them, drop above rows immediately,
@@ -135,13 +141,12 @@ def set_move_down_event(difficulty, game):
 
 
 def check_for_game_over(game):
-    # get list of locations for all objects
-    locs = game.get_object_locations()
-    # check if location of active shape intersects with a block in the grid
-    if pygame.rect.collidelist(locs) == -1:
+    # special case of collision detection when active shape is in starting location
+    # and has already collided with blocks in the grid.
+    if game.check_for_collisions():
         return True
-    else:
-        return False
+
+    return False
 
 
 def check_for_active_shape(game):
@@ -185,8 +190,7 @@ def handle_keydown_events(event, game):
         quit_game(game)
 
     if event.key in (pygame.K_w,pygame.K_UP): # rotate
-        pass
-        # game.try_rotate()
+        try_rotate(game)
 
     if event.key in (pygame.K_a, pygame.K_LEFT): # move left
         try_move_left(game)
@@ -209,8 +213,8 @@ def is_out_of_bounds(game):
         # print (x, y)
         if x < 0 or x >= SCREEN_WIDTH - TILE_SIZE \
         or y < 0 or y >= SCREEN_HEIGHT - TILE_SIZE:
-            print ("out of bounds!")
             return True
+
     return False
 
 
@@ -220,31 +224,45 @@ def revert_locs(locs, game):
 
 
 def try_move_down(game):
-    # TODO: check collisions
+    if not game.active_shape:
+        return
+
     old_locs = game.copy_active_shape_block_locs()
     game.active_shape.move_down()
-    if is_out_of_bounds(game):
-        print ("reverting to", old_locs)
+    if is_out_of_bounds(game) or game.check_for_collisions():
         revert_locs(old_locs, game)
+        game.active_shape.falling = False # shape can't move any further down
+        game.unpack_active_shape() # transfer blocks to the grid
 
 
 def try_move_left(game):
-    # TODO: check collisions
+    if not game.active_shape:
+        return
+
     old_locs = game.copy_active_shape_block_locs()
     game.active_shape.move_left()
-    if is_out_of_bounds(game):
-        print ("reverting to", old_locs)
+    if is_out_of_bounds(game) or game.check_for_collisions():
         revert_locs(old_locs, game)
-        # for i in range(len(old_locs)):
-        #     game.active_shape.blocks[i].location = old_locs[i]
 
 
 def try_move_right(game):
-    # TODO: check collisions
+    if not game.active_shape:
+        return
+
     old_locs = game.copy_active_shape_block_locs()
     game.active_shape.move_right()
-    if is_out_of_bounds(game):
-        print ("reverting to", old_locs)
+    if is_out_of_bounds(game) or game.check_for_collisions():
+        revert_locs(old_locs, game)
+
+
+def try_rotate(game):
+    # TODO: fix skewed rotations
+    if not game.active_shape:
+        return
+
+    old_locs = game.copy_active_shape_block_locs()
+    game.active_shape.rotate()
+    if is_out_of_bounds(game) or game.check_for_collisions():
         revert_locs(old_locs, game)
 
 
@@ -272,12 +290,6 @@ def draw_objects(game):
         for y in range(len(game.grid[x])):        
             if game.grid[x][y]:
                 game.grid[x][y].draw(game.window, TILE_SIZE)
-
-    # for o in game.objects:
-    #     try:
-    #         o.draw()
-    #     except AttributeError:
-    #         print("object did not have a draw method.")
 
 
 def draw_grid(game):
