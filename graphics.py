@@ -20,11 +20,27 @@ class shapes:
 
 class shape:
     def __init__(self, location, color, block_dim, window):
-        self.location = location
+        self.location = location # location of "core block"
         self.color = color
         self.falling = True
+        self.blocks = []
+        self.block_dim = block_dim
     # def draw(self, block_dim):
     #     pygame.draw.rect(window, self.color, (self.location[0], self.location[1], block_dim, block_dim))
+    def move_down(self):
+        self.location[1] += self.block_dim  # update "core block" location
+        for b in self.blocks:
+            b.location[1] += self.block_dim
+
+    def move_left(self):
+        self.location[0] -= self.block_dim  # update "core block" location
+        for b in self.blocks:
+            b.location[0] -= self.block_dim
+
+    def move_right(self):
+        self.location[0] += self.block_dim  # update "core block" location
+        for b in self.blocks:
+            b.location[0] += self.block_dim
 
 class square(shape):
     def __init__(self, location, color, block_dim, window):

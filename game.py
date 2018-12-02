@@ -72,9 +72,14 @@ class Game:
 			for col in range(tiles_width):
 				self.grid[row].append(None)
 
+	def get_active_shape_block_locs(self):
+		return [b.location for b in self.active_shape.blocks]
+
+	def copy_active_shape_block_locs(self):
+		return [list(b.location) for b in list(self.active_shape.blocks)]
 
 	def get_object_locations(self):
-		shape_blocks_locs = [b.location for b in self.active_shape.blocks]
+		shape_blocks_locs = self.get_active_shape_block_locs()
 		grid_blocks_locs = [b.location for b in self.get_grid_blocks()]
 		locs = [shape_blocks_locs]
 		for i in range(len(grid_blocks_locs)):
@@ -86,10 +91,3 @@ class Game:
 	def get_grid_blocks(self):
 		# Assumption: all objects in self.grid are either None or type graphics.block
 		return [b for b in self.grid if b]
-
-
-	def move_down_active_shape(self):
-		# TODO: check boundaries
-		self.active_shape.location[1] += self.tile_size
-		for b in self.active_shape.blocks:
-			b.location[1] += self.tile_size

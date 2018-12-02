@@ -169,7 +169,7 @@ def check_events(game):
             handle_keydown_events(event, game)
         
         elif event.type == game.move_down_event:
-            game.move_down_active_shape()
+            try_move_down(game) # move shape down periodically
 
         else:
             pygame.event.pump() # let pygame process internal events
@@ -184,32 +184,68 @@ def handle_keydown_events(event, game):
         # sys.exit()
         quit_game(game)
 
-    #   if event.key in (pygame.K_w,pygame.K_UP):
-    #       if game.objects[0].y - 5 >= 0:
-    #           game.objects[0].y -= 5
-    #       else:
-    #           game.objects[0].y = 0
+    if event.key in (pygame.K_w,pygame.K_UP): # rotate
+        pass
+        # game.try_rotate()
 
-    #   if event.key in (pygame.K_a, pygame.K_LEFT):
-    #       if game.objects[0].x - 5 >= 0:
-    #           game.objects[0].x -= 5
-    #       else:
-    #           game.objects[0].x = 0
+    if event.key in (pygame.K_a, pygame.K_LEFT): # move left
+        try_move_left(game)
 
-    #   if event.key in (pygame.K_s, pygame.K_DOWN):
-    #       if game.objects[0].y + game.objects[0].length + 5 <= SCREEN_HEIGHT:
-    #           game.objects[0].y += 5
-    #       else:
-    #           game.objects[0].y = SCREEN_HEIGHT - game.objects[0].length
+    if event.key in (pygame.K_s, pygame.K_DOWN): # move down
+        try_move_down(game)
 
-    #   if event.key in (pygame.K_d, pygame.K_RIGHT):
-    #       if game.objects[0].x + game.objects[0].width + 5 <= SCREEN_WIDTH:
-    #           game.objects[0].x += 5
-    #       else:
-    #           game.objects[0].x = SCREEN_WIDTH - game.objects[0].width
+    if event.key in (pygame.K_d, pygame.K_RIGHT): # move right
+        try_move_right(game)
 
     # elif event.type == pygame.USEREVENT: # TEST
     #   print(event.code)
+
+
+def is_out_of_bounds(game):
+    # check if active shape's location is out of bounds
+    locs = game.get_active_shape_block_locs()
+    # print(locs)
+    for x,y in locs:
+        # print (x, y)
+        if x < 0 or x >= SCREEN_WIDTH - TILE_SIZE \
+        or y < 0 or y >= SCREEN_HEIGHT - TILE_SIZE:
+            print ("out of bounds!")
+            return True
+    return False
+
+
+def revert_locs(locs, game):
+    for i in range(len(locs)):
+        game.active_shape.blocks[i].location = locs[i]
+
+
+def try_move_down(game):
+    # TODO: check collisions
+    old_locs = game.copy_active_shape_block_locs()
+    game.active_shape.move_down()
+    if is_out_of_bounds(game):
+        print ("reverting to", old_locs)
+        revert_locs(old_locs, game)
+
+
+def try_move_left(game):
+    # TODO: check collisions
+    old_locs = game.copy_active_shape_block_locs()
+    game.active_shape.move_left()
+    if is_out_of_bounds(game):
+        print ("reverting to", old_locs)
+        revert_locs(old_locs, game)
+        # for i in range(len(old_locs)):
+        #     game.active_shape.blocks[i].location = old_locs[i]
+
+
+def try_move_right(game):
+    # TODO: check collisions
+    old_locs = game.copy_active_shape_block_locs()
+    game.active_shape.move_right()
+    if is_out_of_bounds(game):
+        print ("reverting to", old_locs)
+        revert_locs(old_locs, game)
 
 
 # render helpers
@@ -254,10 +290,3 @@ def draw_grid(game):
         start = (0, y*TILE_SIZE)
         end = (SCREEN_WIDTH, y*TILE_SIZE)
         pygame.draw.line(game.window, WHITE, start, end, GRID_LINE_THICKNESS)
-
-
-
-
-
-
-
