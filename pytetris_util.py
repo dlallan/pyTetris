@@ -88,7 +88,7 @@ def startup_tetris():
     # global TEST_ser_thread
 
     pygame.init()
-    pygame.key.set_repeat(100, FPS//2)  # enable key repeats every half a frame
+    pygame.key.set_repeat(100, FPS)  # enable key repeats every half a frame
     
     # ser = None 
     # try: 
@@ -194,6 +194,7 @@ def check_events(game):
         
         elif event.type == game.move_down_event:
             try_move_down(game) # move shape down periodically
+            # pass
 
         else:
             pygame.event.pump() # let pygame process internal events
@@ -293,6 +294,11 @@ def try_rotate(game):
     game.active_shape.rotate()
     if is_out_of_bounds(game) or game.check_for_collisions():
         revert_locs(old_locs, game)
+        revert_orientation(game)
+
+def revert_orientation(game):
+    game.active_shape.orientation += 270 # -90 is equivalent to +270 rotation
+    game.active_shape.orientation %= 360
 
 
 # render helpers

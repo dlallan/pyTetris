@@ -55,6 +55,12 @@ Extra Features:
 	
 	class inheritance with super:
 	https://www.pythonforbeginners.com/super/working-python-super-function
+	
+	The notion of an active shape and a grid were drawn from a previous implmentation 
+	of tetris made by Dillon Allan in C#: 
+	https://github.com/dlallan/TetrisInCSharp
+	(Do note that this DID NOT mean that code was reused from the C# project.
+	 Implementing Tetris in Python was a completely new experience for both team members.)
 
 
 
