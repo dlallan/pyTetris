@@ -12,7 +12,7 @@ Included Files:
 
 Running Instructions:
 	
-
+	
 Notes and Assumptions:
 
 
@@ -41,6 +41,16 @@ Wiring instructions:
 Extra Features:
 	Game built with pygame:
 	https://www.pygame.org/docs/
+
+	Displaying text to game window:
+	https://pythonprogramming.net/displaying-text-pygame-screen/
+
+	Including Background Image:
+	https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
+	- Anthony Pham
+
+	Background Image:
+	https://drwyjmricaxm7.cloudfront.net/blog/wp-content/uploads/2017/11/10-facts-about-Kremlin.jpg
 
 	Serial interfacing between python and connected Arduino via pyserial:
 	https://pythonhosted.org/pyserial/
