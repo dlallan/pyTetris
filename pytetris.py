@@ -10,7 +10,6 @@ DEBUG = True  # set to False before demo and before submitting!
 def game_over(game):
 	print("Game over. Player score: %s" % (game.player_score))
 	start_new_game = pytetris_util.get_player_ready("Return to Start Menu? (y/n) ")
-	pytetris_util.clean_up_pygame()
 	
 	if start_new_game:
 		new_game()

@@ -1,6 +1,10 @@
 # <put class header info here>
 import graphics, pygame, random
 
+# globals
+DEBUG = False  # set to False before submission!
+
+
 class Game:
 	backgroundColor = (0, 0, 0)
 	def __init__(self, window, tile_size, tiles_width, tiles_height, clock):
@@ -64,15 +68,11 @@ class Game:
 		for b in self.active_shape.blocks: 
 			row = b.location[1] // b.block_dim
 			col = b.location[0] // b.block_dim
-			# print((int(yloc/block_dim)-1), (int(xloc/block_dim)-1))
 			self.grid[row][col] = b  
-
-			# graphics.block(location, current_block.color, block_dim, gameDisplay)
-			# all_blocks.append(graphics.block(location, current_block.color, block_dim, gameDisplay))
 
 
 	def get_rand_color(self):
-		return (self.rgen.randint(100, 200), self.rgen.randint(100, 200), self.rgen.randint(100, 200))
+		return (self.rgen.randint(25, 225), self.rgen.randint(25, 225), self.rgen.randint(25, 225))
 
 
 	def init_grid(self, tiles_width, tiles_height):
@@ -97,7 +97,6 @@ class Game:
 		locs = []
 		shape_blocks_locs = self.get_active_shape_block_locs()
 		for i in range(len(shape_blocks_locs)):
-			# print(shape_blocks_locs[i], (self.tile_size, self.tile_size))
 			locs.append(pygame.Rect(shape_blocks_locs[i], (self.tile_size, self.tile_size)))
 
 		grid_blocks_locs = self.get_grid_blocks_locs()
@@ -111,7 +110,6 @@ class Game:
 		rects = []
 		for row in range(len(self.grid)):
 			for col in range(len(self.grid[row])):
-				# print(row,col)
 				b = self.grid[row][col] 
 				if b: # check if block exists at this grid position
 					rects.append(pygame.Rect(b.location, (b.block_dim, b.block_dim)))		
@@ -137,7 +135,6 @@ class Game:
 		locs = []
 		for row in range(len(self.grid)):
 			for col in range(len(self.grid[row])):
-				# print(row,col)
 				b = self.grid[row][col] 
 				if b: # check if block exists at this grid position
 					locs.append(b.location)
@@ -150,12 +147,14 @@ class Game:
 		# for rows filled with blocks.
 		filled_rows = []
 
-		# print(len(self.grid))
-		# print(self.get_grid_blocks_locs())
 		for row in range(len(self.grid)):
-			print("TEST",row, self.grid[row])
+			if DEBUG:
+				print("TEST",row, self.grid[row])
+			
 			if all([col for col in self.grid[row]]): # ASSUMPTION: col is either block or None
-				print ("row", row, "is full")
+				if DEBUG:
+					print ("row", row, "is full")
+				
 				filled_rows.append(row)
 
 		return filled_rows
@@ -163,34 +162,25 @@ class Game:
 
 	def try_drop_filled_rows(self):
 		filled_rows = self.get_rows_filled() # get filled rows (could get nothing)
-		print("Filled rows:", filled_rows)
-		# add new empty row to beginning of grid, then delete the row
-		
-		# self.grid = [self.grid[row] for row in range(len(self.grid)) if row not in filled_rows]
-		# insert new blank row at top of grid for each filled row
-		# for row in filled_rows:
+		if DEBUG:
+			print("Filled rows:", filled_rows)
+
 		for row in range(len(self.grid)):
 			if row in filled_rows:
 				del self.grid[row]
-				self.grid.insert(0, self.get_new_row())
-				self.shift_rows_down(row)
-
-		# update all block locations above the lowest filled row
-		# if filled_rows:
-			# print("shifting rows down from", filled_rows[-1], "upward...")
-			# self.shift_rows_down(filled_rows[-1])
-			# print(self.get_grid_blocks_locs())
+				self.grid.insert(0, self.get_new_row())  # insert blank row at top of grid
+				self.shift_rows_down(row)  # move rows above filled row down one block
 
 		return len(filled_rows) # indicate how many rows were deleted
-	
+
 
 	def shift_rows_down(self, row):
 		# go over all rows above grid[end]
 		for row in range(row,-1,-1):
-			print("at row", row)
+			if DEBUG:
+				print("at row", row)
 			for block in self.grid[row]:
 				if block: # shift blocks down
-					print("moving block in row", row) 
 					block.location[1] += block.block_dim
 
 

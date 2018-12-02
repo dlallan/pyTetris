@@ -24,23 +24,17 @@ SCORE_MULTIPLIER = 10
 
 # drop speed of shapes (ms)
 EASY = 750
-MEDIUM = 500
-HARD = 250
+MEDIUM = 300
+HARD = 150
 DIFFICULTIES = [EASY, MEDIUM, HARD]
-DIFFICULTY_CHANGE_THRESHOLD = 5 # increase difficulty every n rows cleared
+DIFFICULTY_CHANGE_THRESHOLD = 1*SCORE_MULTIPLIER # increase difficulty every n rows cleared
 
 # Arduino config
 SERIAL_PORT = '/dev/ttyACM0'
 BAUD_RATE = 9600
 
 
-# event helpers
-def clean_up_pygame():
-    pygame.event.pump()
-    pygame.display.quit()
-    pygame.quit()
-
-
+# menu helpers
 def quit_game(game):
     #   print("trying to stop worker thread:", TEST_ser_thread)
     #   TEST_ser_thread.stop_worker_thread()
@@ -48,11 +42,11 @@ def quit_game(game):
     #   # TEST_ser_thread.join()
     #   sys.exit()
     game.game_over = True
-    # pygame.display.quit()
-    # pygame.quit()
+    pygame.event.clear()
+    pygame.display.quit()
+    pygame.quit()
 
 
-# menu helpers
 def validate_user_response(user_response):
     player_ready = False
     valid_response = False
@@ -108,6 +102,7 @@ def startup_tetris():
     update_score_display(game)
     
     # start at lowest difficulty i.e. the speed shapes move down
+    DIFFICULTIES = [EASY, MEDIUM, HARD] # set in case of new game
     set_move_down_event(DIFFICULTIES.pop(0), game)
 
     # TEST_ser_thread = WorkerThread(ser_worker, game.serial_port)
@@ -146,12 +141,15 @@ def update(game):
             if num_filled_rows:
                 update_score(game, num_filled_rows)
 
-                if num_filled_rows >= DIFFICULTY_CHANGE_THRESHOLD:
-                    try_increase_difficulty()
+
+                # increase difficulty every n rows cleared where n = DIFFICULTY_CHANGE_THRESHOLD
+                if num_filled_rows * SCORE_MULTIPLIER >= DIFFICULTY_CHANGE_THRESHOLD:
+                    try_increase_difficulty(game)
 
 
-def try_increase_difficulty():
+def try_increase_difficulty(game):
     if len(DIFFICULTIES):
+        print("increasing difficulty...")
         set_move_down_event(DIFFICULTIES.pop(0), game)
 
 
@@ -205,10 +203,10 @@ def handle_keydown_events(event, game):
     if DEBUG:
         print("KEYDOWN event for key %s" % (event.key))
         
-    if event.key == pygame.K_ESCAPE:
+    if event.key == pygame.K_ESCAPE: # enter pause menu
         # TEST_ser_thread.stop_worker_thread()
         # sys.exit()
-        quit_game(game)
+        pause_game(game)
 
     if event.key in (pygame.K_w,pygame.K_UP): # rotate
         try_rotate(game)
@@ -224,6 +222,19 @@ def handle_keydown_events(event, game):
 
     # elif event.type == pygame.USEREVENT: # TEST
     #   print(event.code)
+
+
+def pause_game(game):
+    game.paused = True
+    while game.paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game.paused = False
+                quit_game(game)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                game.paused = False
+            else:
+                pygame.event.pump()
 
 
 def is_out_of_bounds(game):
