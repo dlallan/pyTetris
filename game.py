@@ -180,7 +180,7 @@ class Game:
 			if DEBUG:
 				print("at row", row)
 			for block in self.grid[row]:
-				if block: # shift blocks down
+				if block:  # shift blocks down
 					block.location[1] += block.block_dim
 
 

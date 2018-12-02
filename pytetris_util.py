@@ -22,6 +22,13 @@ WHITE = 255, 255, 255
 
 SCORE_MULTIPLIER = 10
 
+# Text
+FONT = 'freesansbold.ttf'
+FONT_SIZE_LARGE = 24
+FONT_SIZE_MEDIUM = 20
+# START_LABEL_1 = FONT.render("Welcome to pytetris!", 1, (0,0,0))
+# START_LABEL_2 = FONT.render("Begin new game? (y/n):" , 1, (0,0,0))
+
 # drop speed of shapes (ms)
 EASY = 750
 MEDIUM = 300
@@ -35,6 +42,87 @@ BAUD_RATE = 9600
 
 
 # menu helpers
+def text_objects(text, font):
+    text_surface = font.render(text, True, WHITE)
+    return text_surface, text_surface.get_rect()
+
+
+def game_over_menu(game):
+    large_text = pygame.font.Font(FONT,FONT_SIZE_LARGE)
+    text_surf_1, text_rect_1 = text_objects("Game Over. Player score: %s" % (game.player_score), large_text)
+    text_surf_2, text_rect_2 = text_objects("Return to Start Menu? (y/n)", large_text)
+
+    draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2)
+
+    wait_for_input = True
+    start_menu = False
+    while wait_for_input:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_y:  # start game
+                    wait_for_input = False
+                    start_menu = True
+        
+                elif event.key == pygame.K_n:  # exit
+                    # quit_game()
+                    wait_for_input = False
+
+    return start_menu
+
+
+def start_menu(game):
+    large_text = pygame.font.Font(FONT,FONT_SIZE_LARGE)
+    text_surf_1, text_rect_1 = text_objects("Welcome to pytetris!", large_text)
+    text_surf_2, text_rect_2 = text_objects("Begin new game? (y/n)", large_text)
+
+    draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2)
+
+    wait_for_input = True
+    new_game = False
+    while wait_for_input:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_y:  # start game
+                    wait_for_input = False
+                    new_game = True
+        
+                elif event.key == pygame.K_n:  # exit
+                    quit_game()
+                    wait_for_input = False
+
+    return new_game
+
+
+def pause_menu(game):
+    med_text = pygame.font.Font(FONT,FONT_SIZE_MEDIUM)
+    text_surf_1, text_rect_1 = text_objects("Game Paused.", med_text)
+    text_surf_2, text_rect_2 = text_objects("Esc: Resume  Q: Quit game", med_text)
+
+    draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2)
+
+    wait_for_input = True
+    while wait_for_input:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE: # Resume game
+                    wait_for_input = False
+
+                elif event.key == pygame.K_q:
+                    wait_for_input = False
+                    quit_game(game)
+
+
+def draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2):
+    # center text on screen
+    text_rect_1.center = ((SCREEN_WIDTH/2),(SCREEN_HEIGHT*0.325))
+    text_rect_2.center = ((SCREEN_WIDTH/2),(SCREEN_HEIGHT*0.525))
+    
+    # show message
+    game.window.blit(text_surf_1, text_rect_1)
+    game.window.blit(text_surf_2, text_rect_2)
+    pygame.display.update()    
+
+
 def quit_game(game):
     #   print("trying to stop worker thread:", TEST_ser_thread)
     #   TEST_ser_thread.stop_worker_thread()
@@ -85,18 +173,10 @@ def exit_with_msg(msg):
 
 def startup_tetris():
     global DIFFICULTIES
-    # global TEST_ser_thread
 
     pygame.init()
     pygame.key.set_repeat(100, FPS)  # enable key repeats every half a frame
     
-    # ser = None 
-    # try: 
-    #   ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
-    # except:
-    #   print("[DEBUG] startup: Couldn't connect to serial port", SERIAL_PORT)
-    #   pass
-
     game = Game(pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)),
         TILE_SIZE, NUM_TILES_WIDE, NUM_TILES_LONG, pygame.time.Clock())
     
@@ -105,9 +185,6 @@ def startup_tetris():
     # start at lowest difficulty i.e. the speed shapes move down
     DIFFICULTIES = [EASY, MEDIUM, HARD] # set in case of new game
     set_move_down_event(DIFFICULTIES.pop(0), game)
-
-    # TEST_ser_thread = WorkerThread(ser_worker, game.serial_port)
-    # TEST_ser_thread.start()
 
     return game
 
@@ -120,15 +197,14 @@ def update(game):
 
         # test if new shape has nowhere to go
         if check_for_game_over(game):
-            quit_game(game)
+            game.game_over = True
+            # else:
+            #     print ("Quit game")
+            #     quit_game(game)
 
     # else there is a shape -- check if not falling
     else:
         if not game.active_shape.falling:
-            # if not falling, check for game over cnd
-            # if check_for_game_over(game):
-            #     quit_game(game)
-
             # unpack active shape to grid and clear active shape
             if DEBUG:
                 print("Unpacking active shape")
@@ -194,7 +270,6 @@ def check_events(game):
         
         elif event.type == game.move_down_event:
             try_move_down(game) # move shape down periodically
-            # pass
 
         else:
             pygame.event.pump() # let pygame process internal events
@@ -207,7 +282,8 @@ def handle_keydown_events(event, game):
     if event.key == pygame.K_ESCAPE: # enter pause menu
         # TEST_ser_thread.stop_worker_thread()
         # sys.exit()
-        pause_game(game)
+        # pause_game(game)
+        pause_menu(game)
 
     if event.key in (pygame.K_w,pygame.K_UP): # rotate
         try_rotate(game)
@@ -303,13 +379,14 @@ def revert_orientation(game):
 
 # render helpers
 def render(game):
-    clear_window(game)
-    draw_objects(game)
-    draw_grid(game)
-    update_score_display(game)
+    if pygame.display.get_init() and game.window:
+        clear_window(game)
+        draw_objects(game)
+        draw_grid(game)
+        update_score_display(game)
 
-    # update frame
-    pygame.display.flip()
+        # update frame
+        pygame.display.flip()
 
 
 def clear_window(game):

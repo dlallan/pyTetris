@@ -1,6 +1,6 @@
 ----------------------------------------------------------
-Name: Dillon Allan
-ID: 1350542
+Name: Dillon Allan, Ian Yurychuk
+ID: 1350542, 1552809
 CMPUT 274, Fall 2018
 
 Final Project: pytetris - Python implementation of Tetris
@@ -10,8 +10,12 @@ Included Files:
 	<ADD ALL REQUIRED FILES HERE>
     README
 
+
 Running Instructions:
-	
+	*) Additional python modules: pygame
+	   To install pygame, run "pip install pygame" from the command line 
+	   and follow the instructions on-screen.
+
 
 Notes and Assumptions:
 
@@ -55,6 +59,10 @@ Extra Features:
 	
 	class inheritance with super:
 	https://www.pythonforbeginners.com/super/working-python-super-function
+	
+	rotating shapes about a fixed point:
+	https://vignette.wikia.nocookie.net/tetrisconcept/images/3/3d/SRS-pieces.png/revision/latest?cb=20060626173148
+	https://math.stackexchange.com/questions/363652/understanding-rotation-matrices
 	
 	The notion of an active shape and a grid were drawn from a previous implmentation 
 	of tetris made by Dillon Allan in C#: 
