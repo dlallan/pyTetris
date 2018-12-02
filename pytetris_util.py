@@ -26,7 +26,8 @@ SCORE_MULTIPLIER = 10
 EASY = 750
 MEDIUM = 500
 HARD = 250
-DIFFICULTY_CHANGE_THRESHOLD = SCORE_MULTIPLIER * 5 # increase difficulty every 5 rows cleared
+DIFFICULTIES = [EASY, MEDIUM, HARD]
+DIFFICULTY_CHANGE_THRESHOLD = 5 # increase difficulty every n rows cleared
 
 # Arduino config
 SERIAL_PORT = '/dev/ttyACM0'
@@ -34,6 +35,12 @@ BAUD_RATE = 9600
 
 
 # event helpers
+def clean_up_pygame():
+    pygame.event.pump()
+    pygame.display.quit()
+    pygame.quit()
+
+
 def quit_game(game):
     #   print("trying to stop worker thread:", TEST_ser_thread)
     #   TEST_ser_thread.stop_worker_thread()
@@ -41,8 +48,8 @@ def quit_game(game):
     #   # TEST_ser_thread.join()
     #   sys.exit()
     game.game_over = True
-    pygame.display.quit()
-    pygame.quit()
+    # pygame.display.quit()
+    # pygame.quit()
 
 
 # menu helpers
@@ -72,6 +79,8 @@ def get_player_ready(prompt):
     while not ok:
         user_response = input(prompt)  # ask user if they're ready to play
         begin, ok = validate_user_response(user_response)
+        if pygame.display.get_init():
+            pygame.event.pump() # prevent hanging due to pygame event queue from filling up
     return begin
 
 
@@ -98,8 +107,8 @@ def startup_tetris():
     
     update_score_display(game)
     
-    # start at lowest difficulty i.e. speed shapes move down
-    set_move_down_event(EASY, game)
+    # start at lowest difficulty i.e. the speed shapes move down
+    set_move_down_event(DIFFICULTIES.pop(0), game)
 
     # TEST_ser_thread = WorkerThread(ser_worker, game.serial_port)
     # TEST_ser_thread.start()
@@ -133,6 +142,18 @@ def update(game):
             # check for filled rows
             # if filled rows exist, clear them, drop above rows immediately,
             # update score, and check for difficulty increase
+            num_filled_rows = game.try_drop_filled_rows()
+            if num_filled_rows:
+                update_score(game, num_filled_rows)
+
+                if num_filled_rows >= DIFFICULTY_CHANGE_THRESHOLD:
+                    try_increase_difficulty()
+
+
+def try_increase_difficulty():
+    if len(DIFFICULTIES):
+        set_move_down_event(DIFFICULTIES.pop(0), game)
+
 
 # Description
 # Create or replace the custom event with the given difficulty
@@ -271,6 +292,7 @@ def render(game):
     clear_window(game)
     draw_objects(game)
     draw_grid(game)
+    update_score_display(game)
 
     # update frame
     pygame.display.flip()
