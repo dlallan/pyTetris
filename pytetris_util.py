@@ -1,10 +1,22 @@
-# <add info header here>
+'''
+----------------------------------------------------------
+Name: Dillon Allan, Ian Yurychuk
+ID: 1350542, 1552809
+CMPUT 274, Fall 2018
+
+Final Project: pytetris - Python implementation of Tetris
+----------------------------------------------------------
+The file pytetris_util.py contains utility functions for 
+pytetris.py.
+
+Refer to the README for more information.
+'''
 
 import graphics, sys, pygame 
 from game import Game
 
 
-#globals
+# globals
 DEBUG = False  # set to True before submission!
 
 TILE_SIZE = 40 # controls size of screen, shapes, etc.
@@ -17,31 +29,31 @@ SCREEN_HEIGHT = TILE_SIZE * NUM_TILES_LONG + Y_MARGIN
 GRID_LINE_THICKNESS = 1
 FPS = 50
 
+# colors
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
 
-SCORE_MULTIPLIER = 10
 
 # Text
 FONT = 'freesansbold.ttf'
 FONT_SIZE_LARGE = 24
 FONT_SIZE_MEDIUM = 20
-# START_LABEL_1 = FONT.render("Welcome to pytetris!", 1, (0,0,0))
-# START_LABEL_2 = FONT.render("Begin new game? (y/n):" , 1, (0,0,0))
 
 # drop speed of shapes (ms)
 EASY = 750
 MEDIUM = 300
 HARD = 150
 DIFFICULTIES = [EASY, MEDIUM, HARD]
+
+SCORE_MULTIPLIER = 10
 DIFFICULTY_CHANGE_THRESHOLD = 1*SCORE_MULTIPLIER # increase difficulty every n rows cleared
 
-# Arduino config
+# Arduino config (EXPERIMENTAL -- NOT USED IN FINAL SUBMISSION)
 SERIAL_PORT = '/dev/ttyACM0'
 BAUD_RATE = 9600
 
-# Create instance of Background sprite
-BackGround = graphics.Background('tetrisb.jpg', [0,0])
+# Create instance of Background image
+BACKGROUND = graphics.Background('tetrisbg.jpg', [0,0])
 
 # menu helpers
 def text_objects(text, font):
@@ -50,9 +62,8 @@ def text_objects(text, font):
 
 
 def game_over_menu(game):
-    
-    # Set window background
-    game.window.blit(BackGround.image, BackGround.rect)
+    # # Set window background
+    # game.window.blit(BACKGROUND.image, BACKGROUND.rect)
 
     large_text = pygame.font.Font(FONT,FONT_SIZE_LARGE)
     text_surf_1, text_rect_1 = text_objects("Game Over. Player score: %s" % (game.player_score), large_text)
@@ -64,22 +75,26 @@ def game_over_menu(game):
     start_menu = False
     while wait_for_input:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.QUIT:
+                quit_game(game)
+            
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:  # start game
                     wait_for_input = False
                     start_menu = True
         
                 elif event.key == pygame.K_n:  # exit
-                    # quit_game()
                     wait_for_input = False
+
+            else:
+                pygame.event.pump()
 
     return start_menu
 
 
 def start_menu(game):
-
     # Set window background
-    game.window.blit(BackGround.image, BackGround.rect)
+    game.window.blit(BACKGROUND.image, BACKGROUND.rect)
 
     large_text = pygame.font.Font(FONT,FONT_SIZE_LARGE)
     text_surf_1, text_rect_1 = text_objects("Welcome to pytetris!", large_text)
@@ -91,14 +106,19 @@ def start_menu(game):
     new_game = False
     while wait_for_input:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.QUIT:
+                quit_game(game)
+            
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:  # start game
                     wait_for_input = False
                     new_game = True
         
                 elif event.key == pygame.K_n:  # exit
-                    quit_game()
+                    quit_game(game)
                     wait_for_input = False
+            else:
+                pygame.event.pump()
 
     return new_game
 
@@ -113,13 +133,17 @@ def pause_menu(game):
     wait_for_input = True
     while wait_for_input:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.QUIT:
+                quit_game(game)
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: # Resume game
                     wait_for_input = False
 
                 elif event.key == pygame.K_q:
                     wait_for_input = False
                     quit_game(game)
+            else:
+                pygame.event.pump()
 
 
 def draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2):
@@ -140,10 +164,10 @@ def quit_game(game):
     #   # TEST_ser_thread.join()
     #   sys.exit()
     game.game_over = True
-    pygame.event.clear()
-    pygame.display.quit()
-    pygame.quit()
-
+    # pygame.event.clear()
+    # pygame.display.quit()
+    # pygame.quit()
+    sys.exit(0)
 
 def validate_user_response(user_response):
     player_ready = False
@@ -178,14 +202,15 @@ def get_player_ready(prompt):
 
 def exit_with_msg(msg):
     print(msg)
-    sys.exit()
+    pygame.quit()
+    # sys.exit()
 
 
 def startup_tetris():
     global DIFFICULTIES
 
     pygame.init()
-    pygame.key.set_repeat(100, FPS)  # enable key repeats every half a frame
+    pygame.key.set_repeat(100, FPS)  # enable key repeats every once per frame
     
     game = Game(pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)),
         TILE_SIZE, NUM_TILES_WIDE, NUM_TILES_LONG, pygame.time.Clock())
@@ -208,9 +233,6 @@ def update(game):
         # test if new shape has nowhere to go
         if check_for_game_over(game):
             game.game_over = True
-            # else:
-            #     print ("Quit game")
-            #     quit_game(game)
 
     # else there is a shape -- check if not falling
     else:
@@ -235,7 +257,8 @@ def update(game):
 
 def try_increase_difficulty(game):
     if len(DIFFICULTIES):
-        print("increasing difficulty...")
+        if DEBUG:
+            print("increasing difficulty...")
         set_move_down_event(DIFFICULTIES.pop(0), game)
 
 
@@ -291,8 +314,7 @@ def handle_keydown_events(event, game):
         
     if event.key == pygame.K_ESCAPE: # enter pause menu
         # TEST_ser_thread.stop_worker_thread()
-        # sys.exit()
-        # pause_game(game)
+        game.paused = True
         pause_menu(game)
 
     if event.key in (pygame.K_w,pygame.K_UP): # rotate
@@ -306,19 +328,6 @@ def handle_keydown_events(event, game):
 
     if event.key in (pygame.K_d, pygame.K_RIGHT): # move right
         try_move_right(game)
-
-
-def pause_game(game):
-    game.paused = True
-    while game.paused:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game.paused = False
-                quit_game(game)
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                game.paused = False
-            else:
-                pygame.event.pump()
 
 
 def is_out_of_bounds(game):
@@ -382,6 +391,7 @@ def try_rotate(game):
         revert_locs(old_locs, game)
         revert_orientation(game)
 
+
 def revert_orientation(game):
     game.active_shape.orientation += 270 # -90 is equivalent to +270 rotation
     game.active_shape.orientation %= 360
@@ -400,10 +410,9 @@ def render(game):
 
 
 def clear_window(game):
-    # clear window
-    game.window.fill(Game.backgroundColor)
-    # Set window background
-    game.window.blit(BackGround.image, BackGround.rect)
+    # clear window by overwriting with background
+    game.window.blit(BACKGROUND.image, BACKGROUND.rect)
+
 
 def draw_objects(game):
     # draw stuff

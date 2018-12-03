@@ -7,44 +7,64 @@ Final Project: pytetris - Python implementation of Tetris
 ----------------------------------------------------------
 
 Included Files:
-	<ADD ALL REQUIRED FILES HERE>
+	pytetris.py
+	pytetris_util.py
+	game.py
+	graphics.py
+	tetrisbg.jpg (background image for game)
     README
 
 
 Running Instructions:
-<<<<<<< HEAD
-	*) Additional python modules: pygame
+	0. Additional python modules required: pygame
 	   To install pygame, run "pip install pygame" from the command line 
 	   and follow the instructions on-screen.
 
+	1. From the command line, navigate to the working directory of the project.
 
-=======
-	
-	
->>>>>>> d5d045f1726cff12dc5195fa8d73bb8937dc42ec
+	2. Run the command "pygame pytetris.py"
+
+	3. Follow the on-screen instructions to play the game.
+
+
 Notes and Assumptions:
+	WARNING: Due to some unfortunate issues with running pygame on the VM, 
+			 the game is prone to freezing on shutdown. Attaching strace -p to 
+			 the process showed that a "futex(0xa4b1fba8, FUTEX_WAIT, 3191, NULL" call was 
+			 hanging, which suggested a thread synchronization problem existed between pygame 
+			 and the OS during runtime.
+			 You may need to kill the python process if you encounter such issues.
 
+	The file pytetris.py contains the main logic for the game. It uses helper functions
+	from the pytetris_util.py to start a new game and launch the start menu. From the start 
+	menu, the user can choose to begin playing pytetris, or exit.
 
-Accessories: (for optional Arduino 4-button game controller)
-	- Arduino Mega Board (AMG)
-	- Pushbutton (4)
-	- USB A-micro cable
+	The game runs at a constant frame rate in the main_game function, which checks for events, 
+	updates the game state, and renders graphics once per frame in separate helper functions.
+	The check_events function uses the event queue in pygame to handle different events in the 
+	game. Events include quitting the game, KEYDOWN events for shifting and rotating the 
+	falling shape, and a timed event for dropping the falling shape based on the current 
+	difficulty level (the difficulty increases when the player has earned enough points). The 
+	update function maintains the state of the game by checking if it's time to spawn a new 
+	shape, trigger the game over menu, clear rows, and update the player score. Finally, the 
+	render function draws the game background, game shape, blocks, and grid lines.
 
+	The file game.py contains a single class Game, which is used to capture the state of 
+	pytetris during runtime. It contains attributes for tile size, screen width/height in 
+	tiles, clock, active shape, and grid, which tracks shapes when they stop falling. It 
+	contains methods that are used for spawning new active shapes, "unpacking" the active 
+	shape into the grid, collision deteection, and dropping filled rows.
 
-Wiring instructions:
-	
-	*****UPDATE THESE INSTRUCTIONS*****
-
-	Pin 6 <--> increment pushbutton lead|other lead <--> GND
-	Pin 7 <--> decrement pushbutton lead|other lead <--> GND
-	Pin 9 <--> LED 0 (red) long lead|short lead <--> 560 Ohm resistor <--> GND
-	Pin 10<--> LED 1 (red) long lead|short lead <--> 560 Ohm resistor <--> GND
-	Pin 11<--> LED 2 (grn) long lead|short lead <--> 560 Ohm resistor <--> GND
-	Pin 12<--> LED 3 (red) long lead|short lead <--> 560 Ohm resistor <--> GND
-	Pin 13<--> LED 4 (red) long lead|short lead <--> 560 Ohm resistor <--> GND
-	
-	Pin 5V  <--> Power  (+) rail on breadboard
-	Pin GND <--> Ground (-) rail on breadboard
+	The file graphics.py contains all graphical elements used to render the graphical elements
+	used in pytetris. An object-oriented approach was taken for defining graphics, which uses
+	a base class called shape to define attributes and methods common for all shapes in the
+	game. A block child class was also defined, which represented the tiles used in the game 
+	to form larger types of shapes, and to fill the grid when a shape stopped falling. Other 
+	child classes were defined for the seven different types of shapes used in pytetris.
+	These classes contain collections of blocks to define the shape's structure upon
+	initialization. They also have unique rotate methods defined fixed-point rotations
+	(all shapes except for the "rectangle" follow a simple 90 degree clockwise rotation about
+	 their central block).
 
 
 Extra Features:
@@ -54,28 +74,20 @@ Extra Features:
 	Displaying text to game window:
 	https://pythonprogramming.net/displaying-text-pygame-screen/
 
-	Including Background Image:
+	Including Background Image (answer by user Anthony Pham):
 	https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
-	- Anthony Pham
 
-	Background Image:
+	Background Image accessed 2018.12.02 at:
 	https://drwyjmricaxm7.cloudfront.net/blog/wp-content/uploads/2017/11/10-facts-about-Kremlin.jpg
-
-	Serial interfacing between python and connected Arduino via pyserial:
-	https://pythonhosted.org/pyserial/
-
-	Multithreading for background serial processing and pygame event posting:
-	https://stackoverflow.com/questions/15538287/can-i-add-pygame-events-from-a-second-thread
-	https://stackoverflow.com/questions/18018033/how-to-stop-a-looping-thread-in-python
 
 	Static Properties and Methods:
 	https://stackoverflow.com/questions/68645/are-static-class-variables-possible
 	https://stackoverflow.com/questions/735975/static-methods-in-python
 	
-	class inheritance with super:
+	Class inheritance with super:
 	https://www.pythonforbeginners.com/super/working-python-super-function
 	
-	rotating shapes about a fixed point:
+	Rotating shapes about a fixed point:
 	https://vignette.wikia.nocookie.net/tetrisconcept/images/3/3d/SRS-pieces.png/revision/latest?cb=20060626173148
 	https://math.stackexchange.com/questions/363652/understanding-rotation-matrices
 	
@@ -84,11 +96,3 @@ Extra Features:
 	https://github.com/dlallan/TetrisInCSharp
 	(Do note that this DID NOT mean that code was reused from the C# project.
 	 Implementing Tetris in Python was a completely new experience for both team members.)
-
-
-
-
-
-
-
-

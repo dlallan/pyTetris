@@ -1,4 +1,19 @@
-# <put class header info here>
+"""
+----------------------------------------------------------
+Name: Dillon Allan, Ian Yurychuk
+ID: 1350542, 1552809
+CMPUT 274, Fall 2018
+
+Final Project: pytetris - Python implementation of Tetris
+----------------------------------------------------------
+The file game.py contains a single class Game, which is used to capture the state of 
+pytetris during runtime. It contains attributes for tile size, screen width/height in 
+tiles, clock, active shape, and grid, which tracks shapes when they stop falling. It 
+contains methods that are used for spawning new active shapes, "unpacking" the active 
+shape into the grid, collision deteection, and dropping filled rows.
+
+Refer to the README for more information.
+"""
 import graphics, pygame, random
 
 # globals

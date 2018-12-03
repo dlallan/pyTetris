@@ -37,7 +37,6 @@ must run serial-mon-[their Arduino port no.] to begin a chat session.
 Exit status
 0: Program has ended.
 '''
-
 import pytetris_util
 
 # globals
@@ -46,72 +45,41 @@ DEBUG = False  # set to False before demo and before submitting!
 
 # game states
 def game_over(game):
+	'''Show player score and exit program.'''
 	print("Game over. Player score: %s" % (game.player_score))
-	# start_new_game = pytetris_util.get_player_ready("Return to Start Menu? (y/n) ")
-	
-	# if start_new_game:
-	# 	new_game()
-	# else:
+
 	pytetris_util.exit_with_msg("Exiting pytetris.")
 
 
-# Returns
-# None
-def game_paused():
-	if DEBUG:
-		print("[DEBUG] Game paused.")
-
-	# let user choose to resume game or quit
-	resume = pytetris_util.get_player_ready("Resume game? (y: resume, n: quit game) ")
-	if not resume:
-		pytetris_util.exit_with_msg("Exiting pytetris.")
-		
-
 def main_game(game):
+	'''Main loop for the game.'''
 	if DEBUG:
-		print("[DEBUG] Starting new game.")
+		print("Starting new game.")
 
-	# run main loop for the game
 	while not game.game_over:
-		pytetris_util.render(game)
 		pytetris_util.check_events(game)
 		pytetris_util.update(game)
+		pytetris_util.render(game)
 		
-		if game.game_over:
+		# handle game over/restart conditions
+		if not game.paused and game.game_over:
 			if pytetris_util.game_over_menu(game):
 				game = pytetris_util.startup_tetris() # start a new game when program first runs
 				if not pytetris_util.start_menu(game):    # show start menu dialog for user 
 					game.game_over = True
-	            	
 
 		game.clock.tick(pytetris_util.FPS) # lock game speed to FPS
-
 
 	game_over(game)
 
 
-def new_game():
-	pytetris_util.print_welcome("Welcome to pytetris!")
-	begin = pytetris_util.get_player_ready("Begin new game? (y/n): ")  # ask user if they're ready to play
-
-	if begin:
-		game = pytetris_util.startup_tetris() # set up a new game object
-		main_game(game)
-	else:
-		pytetris_util.exit_with_msg("Exiting pytetris.")	
-
-
-def init_display():
-	pygame.init()
-	return pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
 def main():
-	game = pytetris_util.startup_tetris() # start a new game when program first runs
-	if pytetris_util.start_menu(game): 	  # show start menu dialog for user 
-		print("starting new game...")
+	'''Entry point for the program. Shows the start menu to the user.'''
+	game = pytetris_util.startup_tetris()
+	if pytetris_util.start_menu(game): # show start menu dialog for user 
+		if DEBUG:
+			print("Starting new game...")
 		main_game(game)
-	
-	print("Exiting pytetris.")
 
 	return
 
