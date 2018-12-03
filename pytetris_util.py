@@ -40,6 +40,8 @@ DIFFICULTY_CHANGE_THRESHOLD = 1*SCORE_MULTIPLIER # increase difficulty every n r
 SERIAL_PORT = '/dev/ttyACM0'
 BAUD_RATE = 9600
 
+# Create instance of Background sprite
+BackGround = graphics.Background('tetrisb.jpg', [0,0])
 
 # menu helpers
 def text_objects(text, font):
@@ -392,7 +394,8 @@ def render(game):
 def clear_window(game):
     # clear window
     game.window.fill(Game.backgroundColor)
-
+    # Set window background
+    game.window.blit(BackGround.image, BackGround.rect)
 
 def draw_objects(game):
     # draw stuff
