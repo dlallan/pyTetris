@@ -14,31 +14,44 @@ class shapes:
     
     @staticmethod
     def get_shapes():
+        '''Returns a tuple containing all of the shape types to be randomly selected for new shape spawns'''
         return  shapes.square, shapes.rectangle,\
                 shapes.tee, shapes.leftz, shapes.rightz,\
                 shapes.leftl, shapes.rightl
 
+class Background(pygame.sprite.Sprite):
+    '''This class loads a background image into a pygame sprite'''
+    def __init__(self, image_file, location):
+        pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
+        self.image = pygame.image.load(image_file)
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+
 
 class shape:
+    '''This is the general shape superclass used for all block objects'''
     def __init__(self, location, color, block_dim, window):
         self.location = location # location of "core block"
         self.color = color
         self.falling = True
-        self.blocks = []
+        self.blocks = [] # each shape type will have unique list of locations for intrinsic blocks
         self.block_dim = block_dim
         self.orientation = 0 # orientation in degrees.
 
     def move_down(self):
+        '''Generic move down instructions for each block object'''
         self.location[1] += self.block_dim  # update "core block" location
         for b in self.blocks:
             b.location[1] += self.block_dim
 
     def move_left(self):
+        '''Generic move left instructions for each block object'''
         self.location[0] -= self.block_dim  # update "core block" location
         for b in self.blocks:
             b.location[0] -= self.block_dim
 
     def move_right(self):
+        '''Generic move right instructions for each block object'''
         self.location[0] += self.block_dim  # update "core block" location
         for b in self.blocks:
             b.location[0] += self.block_dim
@@ -49,6 +62,7 @@ class shape:
         self.orientation %= 360
 
     def draw(self, window, block_dim):
+        '''Generic draw instructions for all block objects'''
         for block in self.blocks:
             pygame.draw.rect(window, self.color, (block.location[0], block.location[1], block_dim, block_dim))
 
@@ -60,7 +74,6 @@ class square(shape):
                         block([self.location[0] + block_dim, self.location[1]], color, block_dim, window), \
                         block([self.location[0] + block_dim, self.location[1] + block_dim],color, block_dim, window), \
                         block([self.location[0], self.location[1] + block_dim],color, block_dim, window) ]
-        self.height = block_dim * 2
 
     # Rotation does not affect square shapes
     def rotate(self):
@@ -77,6 +90,9 @@ class rectangle(shape):
                         block([self.location[0] + 2*block_dim, self.location[1]], color, block_dim, window), \
                         block([self.location[0] - block_dim, self.location[1]], color, block_dim, window) ]
 
+    ## Rectangle objects use distinct rotation instructions.
+
+    # Updates the origin of rotation 
     def set_rotation_origin(self):
         relx, rely = 0, 0
         if self.orientation == 0:
@@ -113,6 +129,7 @@ class rectangle(shape):
         relx, rely = self.set_rotation_origin()        
         self.update_orientation()
 
+        # compute new block locations after one rotation
         for block in self.blocks:
             x = block.location[0] - relx
             y = block.location[1] - rely
@@ -133,7 +150,6 @@ class tee(shape):
                         block([self.location[0] + block_dim, self.location[1]], color, block_dim, window), \
                         block([self.location[0] - block_dim, self.location[1]], color, block_dim, window), \
                         block([self.location[0], self.location[1] + block_dim], color, block_dim, window) ]
-        self.height = block_dim * 2
 
 
     def rotate(self):
@@ -157,7 +173,6 @@ class leftz(shape):
                         block([self.location[0] + block_dim, self.location[1] + block_dim], color, block_dim, window), \
                         block([self.location[0] - block_dim, self.location[1]], color, block_dim, window), \
                         block([self.location[0], self.location[1] + block_dim], color, block_dim, window) ]
-        self.height = block_dim * 2
 
     def rotate(self):
         relx = self.blocks[0].location[0]
@@ -180,7 +195,6 @@ class rightz(shape):
                         block([self.location[0] + block_dim, self.location[1]], color, block_dim, window), \
                         block([self.location[0] - block_dim, self.location[1] + block_dim ], color, block_dim, window), \
                         block([self.location[0], self.location[1] + block_dim], color, block_dim, window) ]
-        self.height = block_dim * 2
 
     def rotate(self):
         relx = self.blocks[0].location[0]
@@ -203,7 +217,6 @@ class leftl(shape):
                         block([self.location[0] + block_dim, self.location[1] + block_dim], color, block_dim, window), \
                         block([self.location[0] - block_dim, self.location[1] + block_dim ], color, block_dim, window), \
                         block([self.location[0] - block_dim, self.location[1]], color, block_dim, window) ]
-        self.height = block_dim * 2
 
     def rotate(self):
         relx = self.blocks[0].location[0]
@@ -226,7 +239,6 @@ class rightl(shape):
                         block([self.location[0] - block_dim, self.location[1] + block_dim], color, block_dim, window), \
                         block([self.location[0], self.location[1] + block_dim ], color, block_dim, window), \
                         block([self.location[0] + block_dim, self.location[1] + block_dim], color, block_dim, window) ]
-        self.height = block_dim * 2
 
     def rotate(self):
         relx = self.blocks[2].location[0]
@@ -241,6 +253,7 @@ class rightl(shape):
 
 
 class block(shape):
+    '''General object for a single block, used to fill grid space and construct shape types'''
     def __init__(self, location, color, block_dim, window):
         self.location = location
         self.color = color
