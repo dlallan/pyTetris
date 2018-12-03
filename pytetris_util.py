@@ -50,6 +50,10 @@ def text_objects(text, font):
 
 
 def game_over_menu(game):
+    
+    # Set window background
+    game.window.blit(BackGround.image, BackGround.rect)
+
     large_text = pygame.font.Font(FONT,FONT_SIZE_LARGE)
     text_surf_1, text_rect_1 = text_objects("Game Over. Player score: %s" % (game.player_score), large_text)
     text_surf_2, text_rect_2 = text_objects("Return to Start Menu? (y/n)", large_text)
@@ -73,6 +77,10 @@ def game_over_menu(game):
 
 
 def start_menu(game):
+
+    # Set window background
+    game.window.blit(BackGround.image, BackGround.rect)
+
     large_text = pygame.font.Font(FONT,FONT_SIZE_LARGE)
     text_surf_1, text_rect_1 = text_objects("Welcome to pytetris!", large_text)
     text_surf_2, text_rect_2 = text_objects("Begin new game? (y/n)", large_text)

@@ -30,7 +30,9 @@ def text_objects(text, font):
 def start_menu(display):
 
     display.fill(black)
-
+    # Set window background
+    display.blit(BackGround.image, BackGround.rect)
+    
     largeText = pygame.font.Font('freesansbold.ttf',24)
     TextSurf1, TextRect1 = text_objects("Welcome to pytetris!", largeText)
     TextSurf2, TextRect2 = text_objects("Begin new game? (y/n):", largeText)
