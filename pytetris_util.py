@@ -17,7 +17,7 @@ from game import Game
 
 
 # globals
-DEBUG = False  # set to True before submission!
+DEBUG = False  # set to False before submission!
 
 TILE_SIZE = 40 # controls size of screen, shapes, etc.
 NUM_TILES_WIDE = 10
@@ -46,7 +46,7 @@ HARD = 150
 DIFFICULTIES = [EASY, MEDIUM, HARD]
 
 SCORE_MULTIPLIER = 10
-DIFFICULTY_CHANGE_THRESHOLD = 10 # increase difficulty every n points earned
+DIFFICULTY_CHANGE_THRESHOLD = 100 # increase difficulty every n points earned
 
 # Arduino config (EXPERIMENTAL -- NOT USED IN FINAL SUBMISSION)
 SERIAL_PORT = '/dev/ttyACM0'
