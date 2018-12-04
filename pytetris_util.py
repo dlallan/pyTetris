@@ -12,7 +12,7 @@ pytetris.py.
 Refer to the README for more information.
 '''
 
-import graphics, sys, pygame 
+import graphics, sys, pygame
 from game import Game
 
 
@@ -46,7 +46,7 @@ HARD = 150
 DIFFICULTIES = [EASY, MEDIUM, HARD]
 
 SCORE_MULTIPLIER = 10
-DIFFICULTY_CHANGE_THRESHOLD = 1*SCORE_MULTIPLIER # increase difficulty every n rows cleared
+DIFFICULTY_CHANGE_THRESHOLD = 50 # increase difficulty every n points earned
 
 # Arduino config (EXPERIMENTAL -- NOT USED IN FINAL SUBMISSION)
 SERIAL_PORT = '/dev/ttyACM0'
@@ -248,10 +248,11 @@ def update(game):
             # update score, and check for difficulty increase
             num_filled_rows = game.try_drop_filled_rows()
             if num_filled_rows:
+                prev_score = game.player_score
                 update_score(game, num_filled_rows)
 
-                # increase difficulty every n rows cleared where n = DIFFICULTY_CHANGE_THRESHOLD
-                if num_filled_rows * SCORE_MULTIPLIER >= DIFFICULTY_CHANGE_THRESHOLD:
+                # increase difficulty when new player score exceeds DIFFICULTY_CHANGE_THRESHOLD
+                if abs(game.player_score - prev_score) >= DIFFICULTY_CHANGE_THRESHOLD:
                     try_increase_difficulty(game)
 
 

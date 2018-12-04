@@ -190,6 +190,7 @@ def ser_worker(serial_port):
 	t = threading.currentThread()  # need to check if parent thread modified t.stop
 	print("serial_port arg:", serial_port)
 	while(not t.stop):
+
 		pinStates = poll_serial(serial_port)
 		# if DEBUG:
 		# 	print(pinStates)
@@ -227,7 +228,7 @@ def ser_worker(serial_port):
 							print("Posted KEYDOWN event for key: %s" % (key))
 		t = threading.currentThread()  # need to check if parent thread modified t.stop
 
-		time.sleep(0.1)  # keep thread from pinning
+		time.sleep(1/FPS)  # keep thread from pinning
 	if DEBUG:
 		print("Exiting worker thread...")
 
