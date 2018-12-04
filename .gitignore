@@ -1,2 +1,4 @@
 build-mega2560/
 __pycache__/
+.idea/
+venv/

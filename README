@@ -36,7 +36,8 @@ Notes and Assumptions:
 			 Another developer posted the same issue on StackOverflow, but received no 
 			 solutions as of 12.03.2018:
 			 https://gamedev.stackexchange.com/questions/111039/pygame-freezing-on-quit
-			 
+			 The game shuts down fine when run from a Windows 10 laptop via the PyCharm IDE,
+			 so it may be a problem specific to the VM.
 			 You may need to kill the python process if you encounter such issues. 
 
 	The file pytetris.py contains the main logic for the game. It uses helper functions

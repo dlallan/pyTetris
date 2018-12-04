@@ -147,6 +147,7 @@ def pause_menu(game):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:  # Resume game
                     wait_for_input = False
+                    game.paused = False
 
                 elif event.key == pygame.K_q:  # quit
                     wait_for_input = False
