@@ -33,7 +33,11 @@ Notes and Assumptions:
 			 the process showed that a "futex(0xa4b1fba8, FUTEX_WAIT, 3191, NULL" call was 
 			 hanging, which suggested a thread synchronization problem existed between pygame 
 			 and the OS during runtime.
-			 You may need to kill the python process if you encounter such issues.
+			 Another developer posted the same issue on StackOverflow, but received no 
+			 solutions as of 12.03.2018:
+			 https://gamedev.stackexchange.com/questions/111039/pygame-freezing-on-quit
+			 
+			 You may need to kill the python process if you encounter such issues. 
 
 	The file pytetris.py contains the main logic for the game. It uses helper functions
 	from the pytetris_util.py to start a new game and launch the start menu. From the start 
@@ -64,10 +68,10 @@ Notes and Assumptions:
 	These classes contain collections of blocks to define the shape's structure upon
 	initialization. They also have unique rotate methods defined fixed-point rotations
 	(all shapes except for the "rectangle" follow a simple 90 degree clockwise rotation about
-	 their central block).
+	their central block).
 
 
-Extra Features:
+References and Extra Features:
 	Game built with pygame:
 	https://www.pygame.org/docs/
 
@@ -83,10 +87,10 @@ Extra Features:
 	Static Properties and Methods:
 	https://stackoverflow.com/questions/68645/are-static-class-variables-possible
 	https://stackoverflow.com/questions/735975/static-methods-in-python
-	
+
 	Class inheritance with super:
 	https://www.pythonforbeginners.com/super/working-python-super-function
-	
+
 	Rotating shapes about a fixed point:
 	https://vignette.wikia.nocookie.net/tetrisconcept/images/3/3d/SRS-pieces.png/revision/latest?cb=20060626173148
 	https://math.stackexchange.com/questions/363652/understanding-rotation-matrices

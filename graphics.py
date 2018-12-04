@@ -294,3 +294,4 @@ class block(shape):
     def draw(self, window, block_dim):
         '''Render block to pygame display.'''
         pygame.draw.rect(window, self.color, (self.location[0], self.location[1], block_dim, block_dim))
+        

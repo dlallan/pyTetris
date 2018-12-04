@@ -39,14 +39,14 @@ FONT = 'freesansbold.ttf'
 FONT_SIZE_LARGE = 24
 FONT_SIZE_MEDIUM = 20
 
-# drop speed of shapes (ms)
+# difficulty determined by drop speed of shapes (in ms)
 EASY = 750
 MEDIUM = 300
 HARD = 150
 DIFFICULTIES = [EASY, MEDIUM, HARD]
 
 SCORE_MULTIPLIER = 10
-DIFFICULTY_CHANGE_THRESHOLD = 50 # increase difficulty every n points earned
+DIFFICULTY_CHANGE_THRESHOLD = 10 # increase difficulty every n points earned
 
 # Arduino config (EXPERIMENTAL -- NOT USED IN FINAL SUBMISSION)
 SERIAL_PORT = '/dev/ttyACM0'
@@ -57,20 +57,22 @@ BACKGROUND = graphics.Background('tetrisbg.jpg', [0,0])
 
 # menu helpers
 def text_objects(text, font):
+    '''Get surface and rectangle dimensions for a given text and font.'''
     text_surface = font.render(text, True, WHITE)
     return text_surface, text_surface.get_rect()
 
 
 def game_over_menu(game):
-    # # Set window background
-    # game.window.blit(BACKGROUND.image, BACKGROUND.rect)
-
+    '''Display Game Over menu to user and let them choose if they want to
+    go back to the Start Menu or not.'''
     large_text = pygame.font.Font(FONT,FONT_SIZE_LARGE)
     text_surf_1, text_rect_1 = text_objects("Game Over. Player score: %s" % (game.player_score), large_text)
     text_surf_2, text_rect_2 = text_objects("Return to Start Menu? (y/n)", large_text)
 
     draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2)
 
+    
+    # Have user use keyboard to choose to return to Start Menu or quit.
     wait_for_input = True
     start_menu = False
     while wait_for_input:
@@ -93,6 +95,9 @@ def game_over_menu(game):
 
 
 def start_menu(game):
+    '''Show Start Menu to user and let them choose if they want
+    to start a new game or not.'''
+
     # Set window background
     game.window.blit(BACKGROUND.image, BACKGROUND.rect)
 
@@ -102,6 +107,7 @@ def start_menu(game):
 
     draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2)
 
+    '''Have user use keyboard to choose to begin playing or quit.'''
     wait_for_input = True
     new_game = False
     while wait_for_input:
@@ -124,22 +130,25 @@ def start_menu(game):
 
 
 def pause_menu(game):
+    '''Show Pause Menu to user and let them choose if they want
+    to resume playing or quit.'''
     med_text = pygame.font.Font(FONT,FONT_SIZE_MEDIUM)
     text_surf_1, text_rect_1 = text_objects("Game Paused.", med_text)
     text_surf_2, text_rect_2 = text_objects("Esc: Resume  Q: Quit game", med_text)
 
     draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2)
 
+    '''Have user use keyboard to choose t0 resume game or quit'''
     wait_for_input = True
     while wait_for_input:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit_game(game)
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: # Resume game
+                if event.key == pygame.K_ESCAPE:  # Resume game
                     wait_for_input = False
 
-                elif event.key == pygame.K_q:
+                elif event.key == pygame.K_q:  # quit
                     wait_for_input = False
                     quit_game(game)
             else:
@@ -147,6 +156,7 @@ def pause_menu(game):
 
 
 def draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2):
+    '''Draw two lines of text roughly centred in the pygame display.'''
     # center text on screen
     text_rect_1.center = ((SCREEN_WIDTH/2),(SCREEN_HEIGHT*0.325))
     text_rect_2.center = ((SCREEN_WIDTH/2),(SCREEN_HEIGHT*0.525))
@@ -158,18 +168,20 @@ def draw_centered_msg(game, text_surf_1, text_rect_1, text_surf_2, text_rect_2):
 
 
 def quit_game(game):
+    '''Quit pygame and end the program.'''
+    
+    # EXPERIMENTAL
     #   print("trying to stop worker thread:", TEST_ser_thread)
     #   TEST_ser_thread.stop_worker_thread()
-    #   # TEST_ser_thread.stop = True
-    #   # TEST_ser_thread.join()
-    #   sys.exit()
+
     game.game_over = True
-    # pygame.event.clear()
-    # pygame.display.quit()
-    # pygame.quit()
+    pygame.display.quit()
+    pygame.quit()
     sys.exit(0)
 
+
 def validate_user_response(user_response):
+
     player_ready = False
     valid_response = False
     if len(user_response) > 0:
@@ -185,28 +197,30 @@ def validate_user_response(user_response):
     return player_ready, valid_response
 
 
-def print_welcome(msg):
-    print(msg)
-    return
+# def print_welcome(msg):
+#     print(msg)
+#     return
 
 
-def get_player_ready(prompt):
-    ok = False
-    while not ok:
-        user_response = input(prompt)  # ask user if they're ready to play
-        begin, ok = validate_user_response(user_response)
-        if pygame.display.get_init():
-            pygame.event.pump() # prevent hanging due to pygame event queue from filling up
-    return begin
+# def get_player_ready(prompt):
+#     ok = False
+#     while not ok:
+#         user_response = input(prompt)  # ask user if they're ready to play
+#         begin, ok = validate_user_response(user_response)
+#         if pygame.display.get_init():
+#             pygame.event.pump() # prevent hanging due to pygame event queue from filling up
+#     return begin
 
 
 def exit_with_msg(msg):
+    '''End program with closing message in the console.'''
     print(msg)
     pygame.quit()
-    # sys.exit()
+    sys.exit(0)
 
 
 def startup_tetris():
+    '''Initialize pygame and main game object.'''
     global DIFFICULTIES
 
     pygame.init()
@@ -226,6 +240,8 @@ def startup_tetris():
 
 # update helpers
 def update(game):
+    '''Maintain state of main game object. Run once per frame.'''
+
     # if there's no shape, spawn a new one
     if not check_for_active_shape(game):
         game.spawn_new_shape()
@@ -252,26 +268,26 @@ def update(game):
                 update_score(game, num_filled_rows)
 
                 # increase difficulty when new player score exceeds DIFFICULTY_CHANGE_THRESHOLD
-                if abs(game.player_score - prev_score) >= DIFFICULTY_CHANGE_THRESHOLD:
+                if game.player_score % DIFFICULTY_CHANGE_THRESHOLD == 0:
                     try_increase_difficulty(game)
 
 
 def try_increase_difficulty(game):
+    '''Attempts to increase difficulty. Does nothing if at max difficulty already.'''
     if len(DIFFICULTIES):
         if DEBUG:
             print("increasing difficulty...")
         set_move_down_event(DIFFICULTIES.pop(0), game)
 
 
-# Description
-# Create or replace the custom event with the given difficulty
 def set_move_down_event(difficulty, game):
+    '''Create or update the "move down" event with the given difficulty'''
     pygame.time.set_timer(game.move_down_event, difficulty)
 
 
 def check_for_game_over(game):
-    # special case of collision detection when active shape is in starting location
-    # and has already collided with blocks in the grid.
+    '''special case of collision detection when active shape is in starting location
+    and has already collided with blocks in the grid.'''
     if game.check_for_collisions():
         return True
 
@@ -279,64 +295,75 @@ def check_for_game_over(game):
 
 
 def check_for_active_shape(game):
+    '''Returns None if active shape doesn't exist.
+    This method is only here for readability.'''
     return game.active_shape
 
 
 def update_score(game, n):
+    '''Increase score using n rows cleared, and SCORE_MULTIPLIER.'''
     game.player_score += n*SCORE_MULTIPLIER
 
 
 def update_score_display(game):
+    '''Update window title bar with current player score.'''
     pygame.display.set_caption("pytetris | player score: %s" % (game.player_score))
 
 
 # event helpers
 def check_events(game):
+    '''Handle pygame events. Run once per frame.'''
+
+    # EXPERIMENTAL
     # global TEST_ser_thread
     # with LOCK:# TEST
+    
+    # handle each event in pygame event queue
     for event in pygame.event.get():
         
         if event.type == pygame.QUIT:
             quit_game(game)
 
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:  # keyboard events
             handle_keydown_events(event, game)
         
         elif event.type == game.move_down_event:
-            try_move_down(game) # move shape down periodically
+            try_move_down(game)  # move shape down periodically
 
         else:
             pygame.event.pump() # let pygame process internal events
 
 
 def handle_keydown_events(event, game):
+    '''User control event handling. Uses WASD or arrow keys
+    for shape movement.'''
+
     if DEBUG:
         print("KEYDOWN event for key %s" % (event.key))
         
-    if event.key == pygame.K_ESCAPE: # enter pause menu
-        # TEST_ser_thread.stop_worker_thread()
+    if event.key == pygame.K_ESCAPE:  # enter pause menu
         game.paused = True
         pause_menu(game)
 
-    if event.key in (pygame.K_w,pygame.K_UP): # rotate
+    elif event.key in (pygame.K_w,pygame.K_UP): # rotate
         try_rotate(game)
 
-    if event.key in (pygame.K_a, pygame.K_LEFT): # move left
+    elif event.key in (pygame.K_a, pygame.K_LEFT): # move left
         try_move_left(game)
 
-    if event.key in (pygame.K_s, pygame.K_DOWN): # move down
+    elif event.key in (pygame.K_s, pygame.K_DOWN): # move down
         try_move_down(game)
 
-    if event.key in (pygame.K_d, pygame.K_RIGHT): # move right
+    elif event.key in (pygame.K_d, pygame.K_RIGHT): # move right
         try_move_right(game)
 
 
 def is_out_of_bounds(game):
-    # check if active shape's location is out of bounds
+    '''check if active shape's location is out of bounds'''
     locs = game.get_active_shape_block_locs()
-    # print(locs)
+    
+    # check each block's location
     for x,y in locs:
-        # print (x, y)
         if x < 0 or x >= SCREEN_WIDTH - TILE_SIZE \
         or y < 0 or y >= SCREEN_HEIGHT - TILE_SIZE:
             return True
@@ -345,16 +372,26 @@ def is_out_of_bounds(game):
 
 
 def revert_locs(locs, game):
+    '''Restore active shape's location to a previous location.'''
+    
+    # revert each block
     for i in range(len(locs)):
         game.active_shape.blocks[i].location = locs[i]
 
 
 def try_move_down(game):
+    '''Try to move active shape down one unit.
+    Does nothing if no active shape exists, or if the move
+    is invalid.'''
+
     if not game.active_shape:
         return
 
     old_locs = game.copy_active_shape_block_locs()
     game.active_shape.move_down()
+
+    # restore old location if new location is out of bounds or collides
+    # with blocks in the grid.
     if is_out_of_bounds(game) or game.check_for_collisions():
         revert_locs(old_locs, game)
         game.active_shape.falling = False # shape can't move any further down
@@ -362,44 +399,65 @@ def try_move_down(game):
 
 
 def try_move_left(game):
+    '''Try to move active shape left one unit.
+    Does nothing if no active shape exists, or if the move
+    is invalid.'''
+
     if not game.active_shape:
         return
 
     old_locs = game.copy_active_shape_block_locs()
     game.active_shape.move_left()
+
+    # restore old location if new location is out of bounds or collides
+    # with blocks in the grid.
     if is_out_of_bounds(game) or game.check_for_collisions():
         revert_locs(old_locs, game)
 
 
 def try_move_right(game):
+    '''Try to move active shape right one unit.
+    Does nothing if no active shape exists, or if the move
+    is invalid.'''
     if not game.active_shape:
         return
 
     old_locs = game.copy_active_shape_block_locs()
     game.active_shape.move_right()
+
+    # restore old location if new location is out of bounds or collides
+    # with blocks in the grid.
     if is_out_of_bounds(game) or game.check_for_collisions():
         revert_locs(old_locs, game)
 
 
 def try_rotate(game):
-    # TODO: fix skewed rotations
+    '''Try to rotate active shape 90 degrees clockwise..
+    Does nothing if no active shape exists, or if the rotation
+    is invalid.'''
     if not game.active_shape:
         return
 
     old_locs = game.copy_active_shape_block_locs()
     game.active_shape.rotate()
+    
+    # restore old location if new location is out of bounds or collides
+    # with blocks in the grid.
     if is_out_of_bounds(game) or game.check_for_collisions():
         revert_locs(old_locs, game)
         revert_orientation(game)
 
 
 def revert_orientation(game):
-    game.active_shape.orientation += 270 # -90 is equivalent to +270 rotation
+    '''Resets a 90 clockwise rotation for the active shape.'''
+    game.active_shape.orientation += 270 # +270 is equivalent to -90 degrees
     game.active_shape.orientation %= 360
 
 
 # render helpers
 def render(game):
+    '''Draw graphics for the game, including background, active shape, grid, 
+    and player score. Called once per frame.'''
     if pygame.display.get_init() and game.window:
         clear_window(game)
         draw_objects(game)
@@ -411,12 +469,12 @@ def render(game):
 
 
 def clear_window(game):
-    # clear window by overwriting with background
+    '''Clear window by overwriting with background.'''
     game.window.blit(BACKGROUND.image, BACKGROUND.rect)
 
 
 def draw_objects(game):
-    # draw stuff
+    '''Draw active shape and grid blocks to pygame display.'''
     if check_for_active_shape(game):
         game.active_shape.draw(game.window, TILE_SIZE)
 
@@ -427,6 +485,7 @@ def draw_objects(game):
 
 
 def draw_grid(game):
+    '''Draw grid lines in pygame based on screen dimensions relative to tile size.'''
     for x in range(0, NUM_TILES_WIDE+1):
         start = (x*TILE_SIZE, 0)
         end = (x*TILE_SIZE, SCREEN_HEIGHT)
