@@ -1,9 +1,26 @@
+"""
+----------------------------------------------------------
+Name: Dillon Allan, Ian Yurychuk
+ID: 1350542, 1552809
+CMPUT 274, Fall 2018
+
+Final Project: pytetris - Python implementation of Tetris
+----------------------------------------------------------
+The file game.py contains a single class Game, which is used to capture the state of 
+pytetris during runtime. It contains attributes for tile size, screen width/height in 
+tiles, clock, active shape, and grid, which tracks shapes when they stop falling. It 
+contains methods that are used for spawning new active shapes, "unpacking" the active 
+shape into the grid, collision deteection, and dropping filled rows.
+
+Refer to the README for more information.
+"""
 import pygame
 
 # globals
 DEBUG = False # set to False before submission!
 
 class shapes:
+    '''Helper class for cataloging different types of shape.'''
     square = "square"
     rectangle = "rectangle"
     tee = "tee"
@@ -14,10 +31,11 @@ class shapes:
     
     @staticmethod
     def get_shapes():
-        '''Returns a tuple containing all of the shape types to be randomly selected for new shape spawns'''
+        '''Returns a tuple containing all of the shape types.'''
         return  shapes.square, shapes.rectangle,\
                 shapes.tee, shapes.leftz, shapes.rightz,\
                 shapes.leftl, shapes.rightl
+
 
 class Background(pygame.sprite.Sprite):
     '''This class loads a background image into a pygame sprite'''
@@ -29,14 +47,14 @@ class Background(pygame.sprite.Sprite):
 
 
 class shape:
-    '''This is the general shape superclass used for all block objects'''
+    '''Base class used for all types of shape objects'''
     def __init__(self, location, color, block_dim, window):
         self.location = location # location of "core block"
         self.color = color
         self.falling = True
-        self.blocks = [] # each shape type will have unique list of locations for intrinsic blocks
+        self.blocks = []            # each shape is made up of a collection of blocks.
         self.block_dim = block_dim
-        self.orientation = 0 # orientation in degrees.
+        self.orientation = 0        # orientation in degrees.
 
     def move_down(self):
         '''Generic move down instructions for each block object'''
@@ -68,6 +86,7 @@ class shape:
 
 
 class square(shape):
+    '''A two-by-two square made of blocks.'''
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)
         self.blocks = [ block([self.location[0], self.location[1]], color, block_dim, window), \
@@ -81,6 +100,7 @@ class square(shape):
             
 
 class rectangle(shape):
+    '''Four-by-one rectangle of blocks.'''
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)
         self.location = location
@@ -90,10 +110,11 @@ class rectangle(shape):
                         block([self.location[0] + 2*block_dim, self.location[1]], color, block_dim, window), \
                         block([self.location[0] - block_dim, self.location[1]], color, block_dim, window) ]
 
-    ## Rectangle objects use distinct rotation instructions.
 
-    # Updates the origin of rotation 
+    # NOTE: Rectangle objects use distinct rotation instructions. 
+    # The other shapes don't need the extra rotation/translation steps.
     def set_rotation_origin(self):
+        '''Updates the origin of rotation relative to the shape's orientation.'''
         relx, rely = 0, 0
         if self.orientation == 0:
             relx = self.blocks[1].location[0]
@@ -112,7 +133,7 @@ class rectangle(shape):
 
 
     def reorient_point(self, block):
-        # re-orient points to refer to top-left corner (needed for drawing)
+        '''Re-orient points to refer to top-left corner (needed for drawing).'''
         if self.orientation == 0:
             block.location[0] -= self.block_dim
         elif self.orientation == 90:
@@ -126,7 +147,8 @@ class rectangle(shape):
 
 
     def rotate(self):
-        relx, rely = self.set_rotation_origin()        
+        '''Performs fixed point 90-degree clockwise rotation about the shape's centre.'''
+        relx, rely = self.set_rotation_origin()
         self.update_orientation()
 
         # compute new block locations after one rotation
@@ -142,6 +164,7 @@ class rectangle(shape):
 
 
 class tee(shape):
+    '''Shape made of four blocks in a tee formation.'''
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)
         self.location = location
@@ -153,6 +176,7 @@ class tee(shape):
 
 
     def rotate(self):
+        '''Performs fixed point 90-degree clockwise rotation about the shape's centre.'''
         relx = self.blocks[0].location[0]
         rely = self.blocks[0].location[1]
         for block in self.blocks:
@@ -165,6 +189,7 @@ class tee(shape):
 
 
 class leftz(shape):
+    '''Shape made of four blocks in a left-hand Z formation.'''
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)
         self.location = location
@@ -175,6 +200,7 @@ class leftz(shape):
                         block([self.location[0], self.location[1] + block_dim], color, block_dim, window) ]
 
     def rotate(self):
+        '''Performs fixed point 90-degree clockwise rotation about the shape's centre.'''
         relx = self.blocks[0].location[0]
         rely = self.blocks[0].location[1]
         for block in self.blocks:
@@ -187,6 +213,7 @@ class leftz(shape):
 
 
 class rightz(shape):
+    '''Shape made of four blocks in a right-hand Z formation.'''
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)
         self.location = location
@@ -197,6 +224,7 @@ class rightz(shape):
                         block([self.location[0], self.location[1] + block_dim], color, block_dim, window) ]
 
     def rotate(self):
+        '''Performs fixed point 90-degree clockwise rotation about the shape's centre.'''
         relx = self.blocks[0].location[0]
         rely = self.blocks[0].location[1]
         for block in self.blocks:
@@ -209,6 +237,7 @@ class rightz(shape):
 
 
 class leftl(shape):
+    '''Shape made of four blocks in a left-hand L formation.'''
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)
         self.location = location
@@ -219,6 +248,7 @@ class leftl(shape):
                         block([self.location[0] - block_dim, self.location[1]], color, block_dim, window) ]
 
     def rotate(self):
+        '''Performs fixed point 90-degree clockwise rotation about the shape's centre.'''
         relx = self.blocks[0].location[0]
         rely = self.blocks[0].location[1]
         for block in self.blocks:
@@ -231,6 +261,7 @@ class leftl(shape):
 
 
 class rightl(shape):
+    '''Shape made of four blocks in a right-hand L formation.'''    
     def __init__(self, location, color, block_dim, window):
         super().__init__(location, color, block_dim, window)
         self.location = location
@@ -241,6 +272,7 @@ class rightl(shape):
                         block([self.location[0] + block_dim, self.location[1] + block_dim], color, block_dim, window) ]
 
     def rotate(self):
+        '''Performs fixed point 90-degree clockwise rotation about the shape's centre.'''
         relx = self.blocks[2].location[0]
         rely = self.blocks[2].location[1]
         for block in self.blocks:
@@ -260,4 +292,5 @@ class block(shape):
         self.block_dim = block_dim
 
     def draw(self, window, block_dim):
+        '''Render block to pygame display.'''
         pygame.draw.rect(window, self.color, (self.location[0], self.location[1], block_dim, block_dim))
